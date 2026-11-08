@@ -75,7 +75,11 @@
     document.getElementById('res-valor').textContent = pesos(resumen.valorInventarioCentavos);
     actualizarAvisoReponer(resumen);
 
-    // Marca la tarjeta del filtro que está aplicado
+    // Los números de alerta se pintan solo si hay algo que avisar
+    document.querySelector('.indicador.bajo').classList.toggle('hay', resumen.bajo > 0);
+    document.querySelector('.indicador.sin').classList.toggle('hay', resumen.sinStock > 0);
+
+    // Marca el indicador del filtro que está aplicado
     for (const tarjeta of tarjetasFiltro) {
       tarjeta.classList.toggle('activa', tarjeta.dataset.filtroEstado === filtroEstado.value);
     }
@@ -97,16 +101,22 @@
         const estado = ESTADOS_STOCK[producto.estado_stock];
 
         const fila = crear('tr', { clase: clases.join(' ') }, [
+          // Nombre arriba; código y categoría abajo, en gris
           crear('td', { clase: 'celda-producto' }, [
             crear('strong', { texto: producto.nombre }),
-            ...(producto.codigo ? [crear('span', { clase: 'codigo', texto: producto.codigo })] : []),
-          ]),
-          crear('td', { texto: producto.categoria ?? '—' }),
-          crear('td', { clase: 'derecha' }, [
             crear('span', {
-              clase: `cantidad ${producto.activo ? estado.clase : ''}`,
-              texto: cantidadCorta(producto.stock, producto.unidad),
+              clase: 'codigo',
+              texto: [producto.codigo, producto.categoria].filter(Boolean).join('  ·  ') || 'Sin código',
             }),
+          ]),
+          crear('td', { clase: 'derecha' }, [
+            crear('span', { clase: 'celda-stock' }, [
+              crear('span', {
+                clase: `cantidad ${producto.activo ? estado.clase : ''}`,
+                texto: cantidadCorta(producto.stock, producto.unidad),
+              }),
+              nivelStock(producto),
+            ]),
           ]),
           crear('td', {
             clase: 'derecha',
@@ -115,7 +125,7 @@
           crear('td', { clase: 'derecha', texto: textoPrecio(producto) }),
           crear('td', {}, [
             producto.activo
-              ? insigniaStock(producto.estado_stock)
+              ? insigniaStock(producto.estado_stock, true)
               : crear('span', { clase: 'insignia gris', texto: 'De baja' }),
           ]),
         ]);
@@ -138,7 +148,7 @@
       buscador.value.trim() !== '' || filtroCategoria.value !== '' || filtroEstado.value !== 'todos';
     vacio.textContent = hayFiltro
       ? 'No hay productos que coincidan con el filtro.'
-      : 'Todavía no hay productos. Cargá el primero con "+ Nuevo producto".';
+      : 'Todavía no hay productos. Cargá el primero con "Nuevo producto".';
     vacio.hidden = productos.length > 0;
     contador.textContent = `${productos.length} producto${productos.length === 1 ? '' : 's'}`;
   }
@@ -178,62 +188,54 @@
     const ganancia = porcentajeGanancia(producto.costo_centavos, producto.precio_centavos);
     const unidad = UNIDADES[producto.unidad];
 
-    const dato = (etiqueta, valor, clase = '') => [
-      crear('dt', { texto: etiqueta }),
-      crear('dd', { clase, texto: valor || '—' }),
-    ];
+    // Cada dato es un renglón: <div><dt>etiqueta</dt><dd>valor</dd></div>
+    const dato = (etiqueta, valor, clase = '') =>
+      crear('div', {}, [crear('dt', { texto: etiqueta }), crear('dd', { clase, texto: valor || '—' })]);
 
     detalle.replaceChildren(
       crear('div', { clase: 'detalle-cabecera' }, [
-        crear('span', {
-          clase: 'avatar caja',
-          texto: (producto.categoria ?? producto.nombre).charAt(0).toUpperCase(),
+        crear('h2', { texto: producto.nombre }),
+        crear('p', {
+          clase: 'subtitulo',
+          texto: [producto.codigo ? `Código ${producto.codigo}` : 'Sin código', producto.categoria]
+            .filter(Boolean)
+            .join(' · '),
         }),
-        crear('div', {}, [
-          crear('h2', { texto: producto.nombre }),
-          crear('p', {
-            clase: 'subtitulo',
-            texto: [producto.codigo ? `Código ${producto.codigo}` : 'Sin código', producto.categoria]
-              .filter(Boolean)
-              .join(' · '),
-          }),
-        ]),
       ]),
 
-      // Cuánto hay: el número protagonista
+      // Cuánto queda: el número protagonista, con su barrita de nivel
       crear('div', { clase: `existencia ${producto.activo ? estado.clase : 'gris'}` }, [
-        crear('div', { clase: 'existencia-titulo' }, [
-          crear('strong', {}, [
-            crear('span', { clase: 'numero-stock', texto: numeroCantidad(producto.stock) }),
-            crear('span', {
-              clase: 'unidad-stock',
-              texto: producto.stock === 1000 ? unidad.singular : unidad.plural,
-            }),
-          ]),
-          producto.activo
-            ? insigniaStock(producto.estado_stock)
-            : crear('span', { clase: 'insignia gris', texto: 'Dado de baja' }),
+        crear('div', { clase: 'existencia-numero' }, [
+          crear('span', { clase: 'numero-stock', texto: numeroCantidad(producto.stock) }),
+          crear('span', {
+            clase: 'unidad-stock',
+            texto: producto.stock === 1000 ? unidad.singular : unidad.plural,
+          }),
         ]),
-        crear('span', { texto: textoExistencia(producto) }),
+        nivelStock(producto),
+        producto.activo
+          ? insigniaStock(producto.estado_stock)
+          : crear('span', { clase: 'insignia gris', texto: 'Dado de baja' }),
+        crear('p', { clase: 'existencia-texto', texto: textoExistencia(producto) }),
       ]),
 
       crear('dl', { clase: 'lista-datos' }, [
-        ...dato('Se vende por', NOMBRES_UNIDAD[producto.unidad]),
-        ...dato('Costo', producto.costo_centavos ? pesos(producto.costo_centavos) : ''),
-        ...dato('Precio', textoPrecio(producto), 'resaltado'),
-        ...dato(
+        dato('Se vende por', NOMBRES_UNIDAD[producto.unidad]),
+        dato('Costo', producto.costo_centavos ? pesos(producto.costo_centavos) : ''),
+        dato('Precio', textoPrecio(producto), 'resaltado'),
+        dato(
           'Ganancia',
           ganancia === null
             ? ''
             : `${pesos(producto.precio_centavos - producto.costo_centavos)} (${textoPorcentaje(ganancia)})`
         ),
-        ...dato(
+        dato(
           'Valor en stock',
           producto.stock > 0 && producto.costo_centavos
             ? pesos(Math.round((producto.stock * producto.costo_centavos) / 1000))
             : ''
         ),
-        ...dato('Alta', fechaCorta(producto.creado_en)),
+        dato('Alta', fechaCorta(producto.creado_en)),
       ]),
 
       crear('div', { clase: 'acciones' }, [

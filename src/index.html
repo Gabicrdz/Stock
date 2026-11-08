@@ -6,67 +6,66 @@
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; script-src 'self'; style-src 'self'"
     />
-    <title>Mi Almacén</title>
+    <title>Mi Almacén — Control de stock</title>
 
-    <!-- Fuentes locales (funcionan sin internet) -->
-    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/400.css" />
-    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/500.css" />
-    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/600.css" />
-    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/700.css" />
-    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/800.css" />
-
+    <!-- Las fuentes (Inter y Lora) están en la carpeta fuentes/ y se cargan desde index.css -->
     <link rel="stylesheet" href="index.css" />
   </head>
   <body>
     <div class="app">
-      <!-- ===== Barra superior ===== -->
-      <header class="barra">
+      <!-- ===== Menú lateral ===== -->
+      <aside class="lateral">
         <div class="marca">
-          <span class="logo">MA</span>
+          <!-- Logo: una caja dibujada con dos trazos -->
+          <svg class="logo" viewBox="0 0 26 26" fill="none" aria-hidden="true">
+            <rect x="2.5" y="6.5" width="21" height="17" rx="2" stroke="currentColor" stroke-width="1.6" />
+            <path d="M2.5 11.5h21M10 11.5v4h6v-4" stroke="currentColor" stroke-width="1.6" />
+            <path d="M6 6.5l2-4h10l2 4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
+          </svg>
           <div>
             <strong>Mi Almacén</strong>
             <small>Control de stock</small>
           </div>
         </div>
-        <nav class="pestanas" aria-label="Secciones">
+        <nav class="menu" aria-label="Secciones">
           <button class="nav-boton" type="button" data-vista="productos">
-            Productos<span id="aviso-reponer" class="aviso-pestana" title="Productos para reponer" hidden></span>
+            Productos
+            <span id="aviso-reponer" class="aviso-pestana" title="Productos para reponer" hidden></span>
           </button>
           <button class="nav-boton" type="button" data-vista="categorias">Categorías</button>
         </nav>
-      </header>
+      </aside>
 
       <main class="contenido">
         <!-- ===== Vista: Productos ===== -->
         <section id="vista-productos" class="vista" hidden>
           <header class="encabezado-vista">
-            <h1>Productos</h1>
+            <div>
+              <h1>Productos</h1>
+              <p class="bajada">Lo que hay en el almacén, al día.</p>
+            </div>
             <button id="btn-nuevo-producto" class="boton boton-primario" type="button">
-              + Nuevo producto
+              Nuevo producto
             </button>
           </header>
 
-          <!-- Tarjetas: un clic filtra la lista -->
-          <div class="tarjetas tarjetas-stock">
-            <button class="tarjeta" type="button" data-filtro-estado="todos">
-              <span>Productos activos</span>
+          <!-- Indicadores: un clic filtra la lista -->
+          <div class="indicadores">
+            <button class="indicador" type="button" data-filtro-estado="todos">
               <strong id="res-activos">0</strong>
-              <span class="detalle-tarjeta">Ver todos</span>
+              <span>Productos activos</span>
             </button>
-            <button class="tarjeta ambar" type="button" data-filtro-estado="bajo">
-              <span>Stock bajo</span>
+            <button class="indicador bajo" type="button" data-filtro-estado="bajo">
               <strong id="res-bajo">0</strong>
-              <span class="detalle-tarjeta">Llegaron al mínimo</span>
+              <span>Con stock bajo</span>
             </button>
-            <button class="tarjeta roja" type="button" data-filtro-estado="sin_stock">
-              <span>Sin stock</span>
+            <button class="indicador sin" type="button" data-filtro-estado="sin_stock">
               <strong id="res-sin-stock">0</strong>
-              <span class="detalle-tarjeta">No queda nada</span>
+              <span>Sin stock</span>
             </button>
-            <div class="tarjeta destacada">
-              <span>Valor del inventario</span>
+            <div class="indicador">
               <strong id="res-valor">$ 0</strong>
-              <span class="detalle-tarjeta">Lo que costó la mercadería que tenés</span>
+              <span>Valor del inventario, al costo</span>
             </div>
           </div>
 
@@ -97,12 +96,11 @@
           </div>
 
           <div class="dos-columnas">
-            <div class="panel panel-tabla">
+            <div class="tabla-contenedor">
               <table class="tabla tabla-seleccionable">
                 <thead>
                   <tr>
                     <th>Producto</th>
-                    <th>Categoría</th>
                     <th class="derecha">Stock</th>
                     <th class="derecha">Mínimo</th>
                     <th class="derecha">Precio</th>
@@ -114,16 +112,19 @@
               <p id="productos-vacio" class="vacio" hidden></p>
             </div>
 
-            <aside id="detalle-producto" class="panel detalle"></aside>
+            <aside id="detalle-producto" class="detalle"></aside>
           </div>
         </section>
 
         <!-- ===== Vista: Categorías ===== -->
         <section id="vista-categorias" class="vista" hidden>
           <header class="encabezado-vista">
-            <h1>Categorías</h1>
+            <div>
+              <h1>Categorías</h1>
+              <p class="bajada">Agrupan los productos para encontrarlos y filtrarlos más rápido.</p>
+            </div>
             <button id="btn-nueva-categoria" class="boton boton-primario" type="button">
-              + Nueva categoría
+              Nueva categoría
             </button>
           </header>
 
@@ -132,7 +133,7 @@
             Mostrar categorías desactivadas
           </label>
 
-          <div class="panel panel-tabla">
+          <div class="tabla-contenedor">
             <table class="tabla">
               <thead>
                 <tr>
@@ -196,6 +197,8 @@
           </div>
         </div>
 
+        <hr class="separador" />
+
         <div class="fila-3">
           <div class="campo">
             <label for="producto-costo" data-etiqueta-unidad="Costo">Costo ($)</label>
@@ -221,6 +224,8 @@
           Cargá el costo y el % de ganancia, y el precio se calcula solo. También podés escribir el
           precio directamente.
         </p>
+
+        <hr class="separador" />
 
         <div class="fila">
           <div class="campo">

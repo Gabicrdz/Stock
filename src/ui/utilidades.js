@@ -118,12 +118,29 @@ function fechaCorta(iso) {
 
 // ---------- Estado del stock ----------
 const ESTADOS_STOCK = {
-  ok: { texto: 'Con stock', clase: 'verde' },
-  bajo: { texto: 'Stock bajo', clase: 'amarilla' },
-  sin_stock: { texto: 'Sin stock', clase: 'roja' },
+  ok: { texto: 'Con stock', corto: 'Con stock', clase: 'verde' },
+  bajo: { texto: 'Stock bajo', corto: 'Bajo', clase: 'amarilla' },
+  sin_stock: { texto: 'Sin stock', corto: 'Sin stock', clase: 'roja' },
 };
 
-function insigniaStock(estado) {
+// corto = true para las tablas, donde el espacio es poco
+function insigniaStock(estado, corto = false) {
   const info = ESTADOS_STOCK[estado] ?? ESTADOS_STOCK.ok;
-  return crear('span', { clase: `insignia ${info.clase}`, texto: info.texto });
+  return crear('span', { clase: `insignia ${info.clase}`, texto: corto ? info.corto : info.texto });
+}
+
+// Barrita de nivel (como el medidor de nafta). Está llena cuando hay el triple del
+// mínimo o más; si el producto no tiene mínimo, llena si hay algo y vacía si no.
+function nivelStock(producto) {
+  const { stock, stock_minimo: minimo } = producto;
+  let porcentaje;
+  if (stock <= 0) porcentaje = 0;
+  else if (minimo > 0) porcentaje = Math.min(100, (stock / (minimo * 3)) * 100);
+  else porcentaje = 100;
+
+  const clase = producto.activo ? ESTADOS_STOCK[producto.estado_stock].clase : 'gris';
+  const relleno = crear('span');
+  // Un poquito de barra aunque quede poco, para que se vea que algo hay
+  relleno.style.width = `${stock > 0 ? Math.max(porcentaje, 6) : 0}%`;
+  return crear('span', { clase: `nivel ${clase}`, titulo: 'Nivel de stock respecto del mínimo' }, [relleno]);
 }

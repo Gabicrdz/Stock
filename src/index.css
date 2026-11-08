@@ -1,58 +1,75 @@
 /* =====================================================================
-   Control de stock — estilos
-   Dirección: "planilla de depósito". La misma base que el sistema del
-   gimnasio (tinta negra sobre blanco, Montserrat, líneas finas), con un
-   acento propio: verde petróleo, como las etiquetas de un depósito.
-   Los estados del stock usan un semáforo: verde (con stock), ámbar (bajo)
-   y rojo (sin stock).
+   Mi Almacén — estilos
+   Dirección: "cuaderno de almacén". Hoja blanca, renglones finos como un
+   libro contable, títulos y cantidades en Lora (con serifa) y todo lo
+   demás en Inter.
 
    Principios:
-   1. Líneas finas en lugar de cajas pesadas: bordes de 1px, radio 8px,
-      cero sombras (salvo el diálogo y el aviso flotante).
-   2. Un protagonista por pantalla (la cantidad en stock).
-   3. El acento solo marca dónde se puede actuar.
+   1. Blanco y negro. El color aparece SOLO para el estado del stock:
+      verde (con stock), ámbar (bajo) y rojo (sin stock).
+   2. Renglones, no cajas: líneas de 1px para separar, nada de tarjetas.
+   3. Los números son los protagonistas: grandes, en Lora, alineados.
    ===================================================================== */
+
+/* ---------- Fuentes (archivos dentro del proyecto: funcionan sin internet) ---------- */
+@font-face {
+  font-family: 'Inter';
+  src: url('fuentes/Inter-Regular.woff') format('woff');
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('fuentes/Inter-Medium.woff') format('woff');
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('fuentes/Inter-SemiBold.woff') format('woff');
+  font-weight: 600;
+  font-display: swap;
+}
+
+/* Lora "variable": un solo archivo con todos los grosores del 400 al 700 */
+@font-face {
+  font-family: 'Lora';
+  src: url('fuentes/Lora-Variable.woff') format('woff');
+  font-weight: 400 700;
+  font-display: swap;
+}
 
 /* ---------- Variables: cambiando estas cambia todo el sistema ---------- */
 :root {
-  /* Superficies */
-  --fondo: #f1f3f5;
-  --superficie: #ffffff;
-  --superficie-suave: #f7f8fa;
-  --linea: #dde1e6;
-  --linea-suave: #eceef1;
+  /* Papel y renglones */
+  --papel: #ffffff;
+  --lateral: #f6f6f5;
+  --suave: #f4f4f3;          /* fila elegida, hover */
+  --regla: #e8e8e6;          /* renglón */
+  --regla-fuerte: #d4d4d1;   /* bordes de campos, encabezado de tabla */
 
   /* Tinta */
-  --tinta: #12161c;          /* texto principal y barra superior */
-  --tinta-clara: #1d232b;    /* hover en la barra */
-  --texto-suave: #57606b;
-  --texto-tenue: #6b7480;
+  --tinta: #1b1b1a;
+  --texto: #3a3a38;
+  --texto-suave: #6b6b67;
+  --texto-tenue: #8f8f8a;
 
-  /* Acento: verde petróleo (etiquetas de depósito) */
-  --acento: #0f6b66;
-  --acento-hover: #0a524e;
-  --acento-fondo: #e5f3f1;
-  --acento-foco: rgba(15, 107, 102, 0.3);
-
-  /* Estados del stock (semáforo) */
-  --verde: #166534;
-  --verde-fondo: #e3f5e9;
-  --verde-fuerte: #1f9d55;
-  --ambar: #8a4b05;
-  --ambar-fondo: #fff2cc;
-  --ambar-fuerte: #e0a100;
-  --rojo: #b42318;
-  --rojo-fondo: #fde8e6;
-  --rojo-fuerte: #d92d20;
-  --gris-fondo: #eceef1;
-  --gris-fuerte: #9aa1ab;
+  /* Estados del stock (el único color del sistema) */
+  --ok: #2e7a4b;
+  --ok-punto: #3a9a5e;
+  --bajo: #94570a;
+  --bajo-punto: #e09b1a;
+  --sin: #b42d1d;
+  --sin-punto: #dc3b26;
 
   /* Tipografía */
-  --fuente: 'Montserrat', 'Segoe UI', system-ui, sans-serif;
+  --texto-base: 'Inter', 'Segoe UI', system-ui, sans-serif;
+  --titulos: 'Lora', Georgia, 'Times New Roman', serif;
 
   /* Formas */
-  --radio: 8px;
-  --radio-chico: 6px;
+  --radio: 6px;
 }
 
 /* ---------- Base ---------- */
@@ -71,11 +88,11 @@ body {
 }
 
 body {
-  font-family: var(--fuente);
+  font-family: var(--texto-base);
   font-size: 14px;
   line-height: 1.5;
-  color: var(--tinta);
-  background: var(--fondo);
+  color: var(--texto);
+  background: var(--papel);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -95,151 +112,337 @@ h1,
 h2,
 h3 {
   margin: 0;
+  color: var(--tinta);
+  font-family: var(--titulos);
+  font-weight: 500;
   line-height: 1.15;
-  letter-spacing: -0.02em;
 }
 
 h1 {
-  font-size: 1.9rem;
-  font-weight: 800;
+  font-size: 2rem;
+  letter-spacing: -0.01em;
 }
 
 h2 {
-  font-size: 1.15rem;
-  font-weight: 700;
-}
-
-h3 {
-  margin-bottom: 8px;
-  font-size: 0.95rem;
-  font-weight: 700;
+  font-size: 1.4rem;
 }
 
 /* Foco visible para quien usa el teclado */
 :focus-visible {
-  outline: 3px solid var(--acento-foco);
+  outline: 2px solid var(--tinta);
   outline-offset: 2px;
 }
 
-/* ========== Estructura general ========== */
+/* Números alineados en columna (todos los dígitos del mismo ancho) */
+.numero,
+.tabla .derecha,
+.indicador strong {
+  font-variant-numeric: tabular-nums lining-nums;
+}
+
+/* ========== Estructura: menú a la izquierda + contenido ========== */
 .app {
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr);
+  grid-template-columns: 224px minmax(0, 1fr);
   height: 100%;
 }
 
-/* ---------- Barra superior ---------- */
-.barra {
+/* ---------- Menú lateral ---------- */
+.lateral {
   display: flex;
-  align-items: stretch;
-  gap: 40px;
-  height: 64px;
-  padding: 0 32px;
-  background: var(--tinta);
+  flex-direction: column;
+  gap: 36px;
+  padding: 30px 18px;
+  background: var(--lateral);
+  border-right: 1px solid var(--regla);
 }
 
 .marca {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
+  padding: 0 10px;
 }
 
-/* El logo es una caja: cuadrado con la cinta de embalar marcada arriba */
+/* El logo es una caja dibujada con dos trazos */
 .logo {
-  display: grid;
-  place-items: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 9px;
-  background:
-    linear-gradient(rgba(255, 255, 255, 0.22), rgba(255, 255, 255, 0.22)) top / 100% 9px no-repeat,
-    var(--acento);
-  color: #fff;
-  font-size: 0.82rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
+  width: 26px;
+  height: 26px;
+  flex-shrink: 0;
+  color: var(--tinta);
 }
 
 .marca strong {
   display: block;
-  color: #fff;
-  font-size: 1rem;
-  font-weight: 800;
+  color: var(--tinta);
+  font-family: var(--titulos);
+  font-size: 1.2rem;
+  font-weight: 600;
   line-height: 1.1;
-  letter-spacing: -0.01em;
 }
 
 .marca small {
   display: block;
-  color: #8f98a3;
-  font-size: 0.75rem;
+  margin-top: 2px;
+  color: var(--texto-tenue);
+  font-size: 0.78rem;
 }
 
-.pestanas {
+.menu {
   display: flex;
-  align-items: stretch;
-  gap: 4px;
+  flex-direction: column;
+  gap: 2px;
 }
 
 .nav-boton {
-  position: relative;
-  padding: 0 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 38px;
+  padding: 0 10px;
   border: none;
+  border-radius: var(--radio);
   background: transparent;
-  color: #aab2bd;
+  color: var(--texto-suave);
   font-size: 0.92rem;
-  font-weight: 600;
-  transition: color 0.15s, background-color 0.15s;
+  font-weight: 500;
+  text-align: left;
+  transition: background-color 0.15s, color 0.15s;
 }
 
 .nav-boton:hover {
-  color: #fff;
-  background: var(--tinta-clara);
+  color: var(--tinta);
+  background: #ececea;
 }
 
 .nav-boton.activo {
-  color: #fff;
+  color: var(--tinta);
+  background: #e9e9e7;
+  font-weight: 600;
 }
 
-/* Raya de color debajo de la sección actual */
-.nav-boton.activo::after {
+/* Cuántos productos hay que reponer: punto ámbar + número */
+.aviso-pestana {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--bajo);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.aviso-pestana::before {
   content: '';
-  position: absolute;
-  right: 12px;
-  bottom: 0;
-  left: 12px;
-  height: 3px;
-  border-radius: 3px 3px 0 0;
-  background: var(--acento);
-}
-
-.nav-boton:focus-visible {
-  outline-offset: -4px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bajo-punto);
 }
 
 /* ---------- Contenido ---------- */
 .contenido {
   min-width: 0;
-  padding: 28px 32px 40px;
+  padding: 40px 48px 56px;
   overflow-y: auto;
 }
 
 .vista {
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-width: 1360px;
+  gap: 28px;
+  max-width: 1320px;
   margin: 0 auto;
 }
 
 .encabezado-vista {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 16px;
-  min-height: 44px;
 }
 
+.bajada {
+  margin: 6px 0 0;
+  color: var(--texto-tenue);
+  font-size: 0.9rem;
+}
+
+/* ========== Botones ========== */
+.boton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 18px;
+  border: 1px solid transparent;
+  border-radius: var(--radio);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.boton:active {
+  transform: translateY(1px);
+}
+
+.boton:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Tinta: la acción principal de cada pantalla */
+.boton-primario {
+  background: var(--tinta);
+  color: #fff;
+}
+
+.boton-primario:hover {
+  background: #3a3a38;
+}
+
+.boton-secundario {
+  background: var(--papel);
+  border-color: var(--regla-fuerte);
+  color: var(--tinta);
+}
+
+.boton-secundario:hover {
+  border-color: var(--tinta);
+}
+
+.boton-peligro {
+  background: transparent;
+  color: var(--sin);
+}
+
+.boton-peligro:hover {
+  background: #fbefed;
+}
+
+/* Acciones chicas dentro de tablas: parecen texto subrayado al pasar el mouse */
+.boton-texto {
+  padding: 4px 6px;
+  border: none;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.84rem;
+  font-weight: 500;
+}
+
+.boton-texto:hover {
+  color: var(--tinta);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ========== Campos ========== */
+input,
+select,
+textarea {
+  min-height: 40px;
+  padding: 8px 12px;
+  border: 1px solid var(--regla-fuerte);
+  border-radius: var(--radio);
+  background: var(--papel);
+  color: var(--tinta);
+  font-size: 0.9rem;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+input::placeholder {
+  color: #a8a8a3;
+}
+
+input:hover,
+select:hover {
+  border-color: #b5b5b0;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: var(--tinta);
+  box-shadow: 0 0 0 3px rgba(27, 27, 26, 0.08);
+}
+
+input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  min-height: 0;
+  padding: 0;
+  accent-color: var(--tinta);
+}
+
+/* ========== Indicadores (arriba de Productos) ========== */
+/* Cuatro números sueltos separados por líneas verticales. Un clic filtra la lista. */
+.indicadores {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.4fr);
+  border-top: 1px solid var(--regla);
+  border-bottom: 1px solid var(--regla);
+}
+
+.indicador {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 18px 24px 16px;
+  border: none;
+  border-left: 1px solid var(--regla);
+  background: transparent;
+  text-align: left;
+}
+
+.indicador:first-child {
+  padding-left: 0;
+  border-left: none;
+}
+
+.indicador strong {
+  color: var(--tinta);
+  font-family: var(--titulos);
+  font-size: 2.2rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.indicador span {
+  color: var(--texto-suave);
+  font-size: 0.84rem;
+}
+
+/* Los números de alerta solo se pintan si hay algo que avisar */
+.indicador.bajo.hay strong {
+  color: var(--bajo);
+}
+
+.indicador.sin.hay strong {
+  color: var(--sin);
+}
+
+button.indicador {
+  cursor: pointer;
+}
+
+button.indicador:hover span {
+  color: var(--tinta);
+}
+
+/* El filtro que está aplicado: su texto subrayado */
+button.indicador.activa span {
+  color: var(--tinta);
+  font-weight: 500;
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 5px;
+}
+
+/* ========== Barra de filtros ========== */
 .barra-herramientas {
   display: flex;
   align-items: center;
@@ -248,14 +451,23 @@ h3 {
 
 .buscador {
   flex: 1;
-  max-width: 420px;
+  max-width: 400px;
+}
+
+.barra-herramientas select {
+  border-color: transparent;
+  background-color: transparent;
+  color: var(--texto-suave);
+}
+
+.barra-herramientas select:hover {
+  border-color: var(--regla-fuerte);
 }
 
 .contador {
   margin-left: auto;
-  color: var(--texto-suave);
+  color: var(--texto-tenue);
   font-size: 0.85rem;
-  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
@@ -268,218 +480,83 @@ h3 {
   cursor: pointer;
 }
 
+/* ========== Lista + ficha ========== */
 .dos-columnas {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 340px;
-  gap: 18px;
+  grid-template-columns: minmax(0, 1fr) 330px;
   align-items: start;
 }
 
-/* ========== Botones ========== */
-.boton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  min-height: 40px;
-  padding: 8px 16px;
-  border: 1px solid transparent;
-  border-radius: var(--radio);
-  font-size: 0.88rem;
-  font-weight: 700;
-  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.boton:active {
-  transform: translateY(1px);
-}
-
-.boton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-/* Acento: la acción principal de cada pantalla */
-.boton-primario {
-  background: var(--acento);
-  border-color: var(--acento);
-  color: #fff;
-}
-
-.boton-primario:hover {
-  background: var(--acento-hover);
-  border-color: var(--acento-hover);
-}
-
-.boton-secundario {
-  background: var(--superficie);
-  border-color: var(--linea);
-  color: var(--tinta);
-}
-
-.boton-secundario:hover {
-  border-color: var(--tinta);
-}
-
-.boton-peligro {
-  background: var(--superficie);
-  border-color: #f3c3be;
-  color: var(--rojo);
-}
-
-.boton-peligro:hover {
-  background: var(--rojo-fondo);
-  border-color: var(--rojo);
-}
-
-.boton-ancho {
-  width: 100%;
-  min-height: 46px;
-  font-size: 0.95rem;
-}
-
-/* Acciones chicas dentro de tablas y listas */
-.boton-texto {
-  padding: 4px 8px;
-  border: none;
-  border-radius: var(--radio-chico);
-  background: transparent;
-  color: var(--acento);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.boton-texto:hover {
-  background: var(--acento-fondo);
-}
-
-.boton-mini {
-  justify-self: end;
-  padding: 2px 6px;
-  font-size: 0.76rem;
-}
-
-/* ========== Campos ========== */
-input,
-select,
-textarea {
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-  background: var(--superficie);
-  font-size: 0.9rem;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-textarea {
-  min-height: 0;
-  resize: vertical;
-}
-
-input::placeholder,
-textarea::placeholder {
-  color: #9aa1ab;
-}
-
-input:hover,
-select:hover,
-textarea:hover {
-  border-color: #bfc5cd;
-}
-
-input:focus,
-select:focus,
-textarea:focus {
-  outline: none;
-  border-color: var(--acento);
-  box-shadow: 0 0 0 3px var(--acento-foco);
-}
-
-input[type='checkbox'] {
-  width: 18px;
-  height: 18px;
-  min-height: 0;
-  padding: 0;
-  accent-color: var(--acento);
-}
-
-/* ========== Paneles y tablas ========== */
-.panel {
-  padding: 18px;
-  background: var(--superficie);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-}
-
-.panel-tabla {
-  padding: 0;
+/* ---------- Tablas: renglones de cuaderno ---------- */
+.tabla-contenedor {
+  min-width: 0;
   overflow-x: auto;
 }
 
 .tabla {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.86rem;
+  font-size: 0.9rem;
 }
 
 .tabla th {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--linea);
+  padding: 0 12px 10px;
+  border-bottom: 1px solid var(--regla-fuerte);
   text-align: left;
   color: var(--texto-tenue);
-  font-size: 0.74rem;
-  font-weight: 700;
-  letter-spacing: 0.02em;
+  font-size: 0.8rem;
+  font-weight: 500;
   white-space: nowrap;
 }
 
 .tabla td {
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--linea-suave);
+  padding: 13px 12px;
+  border-bottom: 1px solid var(--regla);
+  vertical-align: middle;
   white-space: nowrap;
 }
 
-.tabla tbody tr:last-child td {
-  border-bottom: none;
-}
-
-.tabla td strong {
-  font-weight: 700;
+.tabla th:first-child,
+.tabla td:first-child {
+  padding-left: 4px;
 }
 
 .tabla .derecha {
   text-align: right;
-  font-variant-numeric: tabular-nums;
 }
 
+.tabla td strong {
+  color: var(--tinta);
+  font-weight: 500;
+}
 
 .tabla-seleccionable tbody tr {
   cursor: pointer;
+  transition: background-color 0.1s;
 }
 
 .tabla-seleccionable tbody tr:hover {
-  background: var(--superficie-suave);
+  background: #fafaf9;
 }
 
 .tabla tr.seleccionada,
 .tabla tr.seleccionada:hover {
-  background: var(--acento-fondo);
+  background: var(--suave);
 }
 
-/* Marca de color en la fila elegida */
+/* Marca de tinta a la izquierda de la fila elegida */
 .tabla tr.seleccionada td:first-child {
-  box-shadow: inset 3px 0 0 var(--acento);
+  box-shadow: inset 2px 0 0 var(--tinta);
+}
+
+.tabla-seleccionable tbody tr:focus-visible {
+  outline: 2px solid var(--tinta);
+  outline-offset: -2px;
 }
 
 .tabla tr.inactivo td,
-.tabla tr.anulado td {
+.tabla tr.inactivo td strong {
   color: var(--texto-tenue);
-}
-
-.tabla tr.anulado td.monto {
-  text-decoration: line-through;
 }
 
 .acciones-fila {
@@ -487,200 +564,244 @@ input[type='checkbox'] {
 }
 
 .vacio {
-  width: 100%;
   margin: 0;
-  padding: 36px 16px;
+  padding: 48px 16px;
   text-align: center;
   color: var(--texto-tenue);
-  font-size: 0.9rem;
+  font-size: 0.92rem;
 }
 
-.texto-tenue {
-  margin: 0;
+/* Nombre del producto + código debajo */
+#tabla-productos td:first-child {
+  width: 100%;
+  min-width: 200px;
+  white-space: normal;
+}
+
+.celda-producto strong {
+  display: block;
+}
+
+.codigo {
+  display: block;
+  margin-top: 2px;
   color: var(--texto-tenue);
-  font-size: 0.86rem;
+  font-size: 0.78rem;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
 }
 
-/* ========== Insignias de estado ========== */
+/* Stock: número + barrita de nivel */
+.celda-stock {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.cantidad {
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+.cantidad.roja {
+  color: var(--sin);
+}
+
+.cantidad.amarilla {
+  color: var(--bajo);
+}
+
+/* La barrita de nivel: como el medidor de nafta.
+   Llena cuando hay el triple del mínimo o más. */
+.nivel {
+  display: block;
+  width: 64px;
+  height: 3px;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--regla);
+}
+
+.nivel > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--ok-punto);
+}
+
+.nivel.amarilla > span {
+  background: var(--bajo-punto);
+}
+
+.nivel.roja > span {
+  background: var(--sin-punto);
+}
+
+.nivel.gris > span {
+  background: var(--texto-tenue);
+}
+
+/* ---------- Estado: punto + texto (sin "pastillas" de color) ---------- */
 .insignia {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 3px 9px 3px 7px;
-  border-radius: var(--radio-chico);
-  font-size: 0.74rem;
-  font-weight: 700;
-  line-height: 1.35;
+  gap: 7px;
+  font-size: 0.84rem;
   white-space: nowrap;
 }
 
-/* Puntito del mismo color que el texto: el estado no depende solo del color */
 .insignia::before {
   content: '';
   width: 7px;
   height: 7px;
+  flex-shrink: 0;
   border-radius: 50%;
   background: currentColor;
 }
 
 .insignia.verde {
-  background: var(--verde-fondo);
-  color: var(--verde);
+  color: var(--ok);
+}
+
+.insignia.verde::before {
+  background: var(--ok-punto);
 }
 
 .insignia.amarilla {
-  background: var(--ambar-fondo);
-  color: var(--ambar);
+  color: var(--bajo);
+}
+
+.insignia.amarilla::before {
+  background: var(--bajo-punto);
 }
 
 .insignia.roja {
-  background: var(--rojo-fondo);
-  color: var(--rojo);
+  color: var(--sin);
+}
+
+.insignia.roja::before {
+  background: var(--sin-punto);
 }
 
 .insignia.gris {
-  background: var(--gris-fondo);
-  color: var(--texto-suave);
+  color: var(--texto-tenue);
 }
 
-/* ========== Ficha del producto ========== */
-.panel.detalle {
+/* ========== Ficha del producto (a la derecha, separada por una línea) ========== */
+.detalle {
   position: sticky;
   top: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
-  max-height: calc(100vh - 64px - 68px);
-  padding: 20px;
+  gap: 26px;
+  max-height: calc(100vh - 96px);
+  margin-left: 28px;
+  padding: 2px 0 2px 28px;
+  border-left: 1px solid var(--regla);
   overflow-y: auto;
 }
 
-.detalle-cabecera {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
 .detalle-cabecera h2 {
-  font-size: 1.25rem;
-  font-weight: 800;
-}
-
-.avatar {
-  display: grid;
-  place-items: center;
-  width: 52px;
-  height: 52px;
-  flex-shrink: 0;
-  border-radius: 50%;
-  background: var(--tinta);
-  color: #fff;
-  font-size: 1.05rem;
-  font-weight: 800;
+  font-size: 1.45rem;
+  line-height: 1.2;
 }
 
 .subtitulo {
-  margin: 3px 0 0;
-  color: var(--texto-suave);
+  margin: 6px 0 0;
+  color: var(--texto-tenue);
   font-size: 0.84rem;
   font-variant-numeric: tabular-nums;
 }
 
-/* La cantidad en stock: el número protagonista de la ficha */
+/* Cuánto queda: el número protagonista */
 .existencia {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  padding: 14px 16px;
-  border: 1px solid var(--linea);
-  border-left: 4px solid var(--gris-fuerte);
-  border-radius: var(--radio);
+  gap: 12px;
 }
 
-.existencia.verde {
-  border-left-color: var(--verde-fuerte);
-}
-
-.existencia.amarilla {
-  border-left-color: var(--ambar-fuerte);
-  background: #fffbeb;
-}
-
-.existencia.roja {
-  border-left-color: var(--rojo-fuerte);
-  background: #fff6f5;
-}
-
-.existencia-titulo {
+.existencia-numero {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px 10px;
+  align-items: baseline;
+  gap: 8px;
 }
 
-.existencia strong {
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
+.numero-stock {
+  color: var(--tinta);
+  font-family: var(--titulos);
+  font-size: 3.2rem;
+  font-weight: 500;
+  line-height: 1;
+  font-variant-numeric: tabular-nums lining-nums;
 }
 
-.existencia > span {
+.existencia.roja .numero-stock {
+  color: var(--sin);
+}
+
+.existencia.amarilla .numero-stock {
+  color: var(--bajo);
+}
+
+.unidad-stock {
   color: var(--texto-suave);
-  font-size: 0.86rem;
-  font-weight: 600;
+  font-size: 1rem;
 }
 
-.existencia.roja > span {
-  color: var(--rojo);
+.existencia .nivel {
+  width: 100%;
+  height: 4px;
 }
 
-.existencia.amarilla > span {
-  color: var(--ambar);
-}
-
-.aviso-baja {
+.existencia-texto {
   margin: 0;
   color: var(--texto-suave);
-  font-size: 0.86rem;
+  font-size: 0.88rem;
 }
 
+/* Datos en renglones: etiqueta a la izquierda, valor a la derecha */
 .lista-datos {
-  display: grid;
-  grid-template-columns: 96px 1fr;
-  gap: 9px 14px;
   margin: 0;
-  font-size: 0.86rem;
+  border-top: 1px solid var(--regla);
+  font-size: 0.88rem;
+}
+
+.lista-datos > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--regla);
 }
 
 .lista-datos dt {
-  color: var(--texto-tenue);
-  font-weight: 600;
+  color: var(--texto-suave);
 }
 
 .lista-datos dd {
   margin: 0;
-  white-space: pre-wrap;
-  word-break: break-word;
+  color: var(--tinta);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.lista-datos .resaltado {
+  font-weight: 600;
 }
 
 .detalle > .acciones {
-  margin: 0;
-  padding-top: 16px;
-  border-top: 1px solid var(--linea-suave);
+  margin-top: -6px;
 }
-
 
 /* ========== Diálogos ========== */
 .dialogo {
   width: min(460px, 92vw);
-  padding: 26px 28px 24px;
+  padding: 32px 32px 28px;
   border: none;
-  border-radius: 12px;
-  color: var(--tinta);
-  box-shadow: 0 30px 70px rgba(10, 14, 20, 0.3);
+  border-radius: 10px;
+  color: var(--texto);
+  box-shadow: 0 24px 64px rgba(20, 20, 18, 0.2);
 }
 
 .dialogo-ancho {
@@ -688,63 +809,60 @@ input[type='checkbox'] {
 }
 
 .dialogo::backdrop {
-  background: rgba(12, 16, 22, 0.55);
+  background: rgba(20, 20, 18, 0.35);
 }
 
 .dialogo h2 {
-  margin-bottom: 18px;
-  font-size: 1.35rem;
-  font-weight: 800;
-}
-
-.subtitulo-dialogo {
-  margin: -12px 0 20px;
-  color: var(--texto-suave);
-  font-size: 0.88rem;
+  margin-bottom: 24px;
+  font-size: 1.6rem;
 }
 
 .campo {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
-.campo label,
-.etiqueta-campo {
-  font-size: 0.8rem;
-  font-weight: 700;
+.campo label {
+  color: var(--texto-suave);
+  font-size: 0.82rem;
+  font-weight: 500;
 }
 
-/* minmax(0, 1fr): las dos columnas siempre iguales, aunque un select tenga un texto largo */
 .fila {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 12px;
+  gap: 14px;
+}
+
+.fila-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
 }
 
 .campo input,
-.campo select,
-.campo textarea {
+.campo select {
   width: 100%;
   min-width: 0;
 }
 
-.dato-calculado {
-  display: flex;
-  align-items: center;
-  min-height: 40px;
-  padding: 8px 12px;
-  border: 1px dashed #bfc5cd;
-  border-radius: var(--radio);
-  background: var(--superficie-suave);
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
+.campo-precio input {
+  font-weight: 600;
+}
+
+/* Separador fino entre grupos de campos del formulario */
+.separador {
+  height: 1px;
+  margin: 6px 0 20px;
+  border: none;
+  background: var(--regla);
 }
 
 .ayuda {
-  margin: -6px 0 8px;
-  color: var(--texto-suave);
+  margin: -8px 0 16px;
+  color: var(--texto-tenue);
   font-size: 0.8rem;
 }
 
@@ -752,79 +870,46 @@ input[type='checkbox'] {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
-  margin-top: 18px;
+  margin-top: 24px;
 }
 
 .error-form {
   min-height: 1.3em;
-  margin: 4px 0 0;
-  color: var(--rojo);
-  font-size: 0.84rem;
-  font-weight: 600;
-}
-
-.tarjetas {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr 1.4fr;
-  gap: 18px;
-}
-
-.tarjeta {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  padding: 18px 20px;
-  background: var(--superficie);
-  border: 1px solid var(--linea);
-  border-radius: var(--radio);
-}
-
-.tarjeta > span {
-  color: var(--texto-suave);
-  font-size: 0.8rem;
-  font-weight: 700;
-}
-
-.tarjeta > strong {
-  font-size: 2rem;
-  font-weight: 800;
-  line-height: 1;
-  letter-spacing: -0.03em;
-  font-variant-numeric: tabular-nums;
+  margin: 0;
+  color: var(--sin);
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
 /* ========== Mensaje flotante ========== */
 .mensaje {
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 28px;
+  bottom: 28px;
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 12px 18px 12px 14px;
+  padding: 11px 16px;
   border-radius: var(--radio);
   background: var(--tinta);
   color: #fff;
   font-size: 0.88rem;
-  font-weight: 600;
-  box-shadow: 0 12px 32px rgba(10, 14, 20, 0.25);
   opacity: 0;
-  transform: translateY(8px);
+  transform: translateY(6px);
   transition: opacity 0.2s, transform 0.2s;
   pointer-events: none;
 }
 
-/* Puntito verde (o rojo si es un error) */
 .mensaje::before {
   content: '';
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
-  background: #34d17a;
+  background: var(--ok-punto);
 }
 
 .mensaje.error::before {
-  background: #ff6b5e;
+  background: var(--sin-punto);
 }
 
 .mensaje.visible {
@@ -834,17 +919,25 @@ input[type='checkbox'] {
 
 /* ========== Pantallas más chicas ========== */
 @media (max-width: 1180px) {
-  .barra {
-    gap: 24px;
-    padding: 0 20px;
+  .app {
+    grid-template-columns: 196px minmax(0, 1fr);
   }
 
   .contenido {
-    padding: 22px 20px 32px;
+    padding: 32px 28px 44px;
   }
 
   .dos-columnas {
-    grid-template-columns: minmax(0, 1fr) 300px;
+    grid-template-columns: minmax(0, 1fr) 290px;
+  }
+
+  .detalle {
+    margin-left: 20px;
+    padding-left: 20px;
+  }
+
+  .indicador {
+    padding: 16px 16px 14px;
   }
 }
 
@@ -854,148 +947,12 @@ input[type='checkbox'] {
   *::before,
   *::after {
     transition: none !important;
-    animation: none !important;
   }
 }
 
-/* Filas seleccionables: foco visible al moverse con Tab */
-.tabla-seleccionable tbody tr:focus-visible {
-  outline: 3px solid var(--acento-foco);
-  outline-offset: -3px;
-}
-
-.acciones-encabezado {
-  display: flex;
-  gap: 10px;
-}
-
-/* =====================================================================
-   STOCK — Etapa 1: productos, categorías y alerta de stock bajo
-   ===================================================================== */
-
-/* ---------- Aviso en la pestaña: cuántos productos hay que reponer ---------- */
-.aviso-pestana {
-  display: inline-grid;
-  place-items: center;
-  min-width: 20px;
-  height: 20px;
-  margin-left: 8px;
-  padding: 0 6px;
-  border-radius: 10px;
-  background: var(--ambar-fuerte);
-  color: var(--tinta);
-  font-size: 0.72rem;
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-  vertical-align: 1px;
-}
-
-/* ---------- Tarjetas de arriba (también sirven de filtro) ---------- */
-.tarjetas-stock {
-  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.35fr);
-}
-
-button.tarjeta {
-  text-align: left;
+/* La crucecita para borrar la búsqueda: gris, no azul */
+input[type='search']::-webkit-search-cancel-button {
+  filter: grayscale(1);
+  opacity: 0.6;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-
-button.tarjeta:hover {
-  border-color: var(--tinta);
-}
-
-/* La tarjeta del filtro que está aplicado */
-button.tarjeta.activa {
-  border-color: var(--acento);
-  box-shadow: inset 0 0 0 1px var(--acento);
-}
-
-.tarjeta .detalle-tarjeta {
-  color: var(--texto-tenue);
-  font-size: 0.78rem;
-  font-weight: 600;
-}
-
-.tarjeta.ambar > strong {
-  color: var(--ambar);
-}
-
-.tarjeta.roja > strong {
-  color: var(--rojo);
-}
-
-.tarjeta.destacada .detalle-tarjeta {
-  color: #aab2bd;
-}
-
-/* ---------- Tabla de productos ---------- */
-.celda-producto strong {
-  display: block;
-  white-space: normal;
-}
-
-.codigo {
-  display: block;
-  margin-top: 2px;
-  color: var(--texto-tenue);
-  font-size: 0.74rem;
-  font-variant-numeric: tabular-nums;
-}
-
-#tabla-productos td:first-child {
-  min-width: 200px;
-  white-space: normal;
-}
-
-.cantidad {
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-.cantidad.roja {
-  color: var(--rojo);
-}
-
-.cantidad.amarilla {
-  color: var(--ambar);
-}
-
-/* ---------- Ficha ---------- */
-/* El "avatar" del producto es una caja con la inicial de su categoría */
-.avatar.caja {
-  border-radius: 10px;
-  background: var(--acento);
-}
-
-.existencia .numero-stock {
-  font-size: 2.1rem;
-  line-height: 1;
-}
-
-.existencia .unidad-stock {
-  margin-left: 6px;
-  color: var(--texto-suave);
-  font-size: 1rem;
-  font-weight: 700;
-}
-
-.detalle .lista-datos {
-  grid-template-columns: 112px 1fr;
-}
-
-.lista-datos .resaltado {
-  font-weight: 800;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ---------- Formulario de producto ---------- */
-.fila-3 {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
-}
-
-.campo-precio input {
-  font-weight: 800;
 }
