@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'"
+    />
+    <title>Mi Almacén</title>
+
+    <!-- Fuentes locales (funcionan sin internet) -->
+    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/400.css" />
+    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/500.css" />
+    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/600.css" />
+    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/700.css" />
+    <link rel="stylesheet" href="../node_modules/@fontsource/montserrat/800.css" />
+
+    <link rel="stylesheet" href="index.css" />
+  </head>
+  <body>
+    <div class="app">
+      <!-- ===== Barra superior ===== -->
+      <header class="barra">
+        <div class="marca">
+          <span class="logo">MA</span>
+          <div>
+            <strong>Mi Almacén</strong>
+            <small>Control de stock</small>
+          </div>
+        </div>
+        <nav class="pestanas" aria-label="Secciones">
+          <button class="nav-boton" type="button" data-vista="productos">
+            Productos<span id="aviso-reponer" class="aviso-pestana" title="Productos para reponer" hidden></span>
+          </button>
+          <button class="nav-boton" type="button" data-vista="categorias">Categorías</button>
+        </nav>
+      </header>
+
+      <main class="contenido">
+        <!-- ===== Vista: Productos ===== -->
+        <section id="vista-productos" class="vista" hidden>
+          <header class="encabezado-vista">
+            <h1>Productos</h1>
+            <button id="btn-nuevo-producto" class="boton boton-primario" type="button">
+              + Nuevo producto
+            </button>
+          </header>
+
+          <!-- Tarjetas: un clic filtra la lista -->
+          <div class="tarjetas tarjetas-stock">
+            <button class="tarjeta" type="button" data-filtro-estado="todos">
+              <span>Productos activos</span>
+              <strong id="res-activos">0</strong>
+              <span class="detalle-tarjeta">Ver todos</span>
+            </button>
+            <button class="tarjeta ambar" type="button" data-filtro-estado="bajo">
+              <span>Stock bajo</span>
+              <strong id="res-bajo">0</strong>
+              <span class="detalle-tarjeta">Llegaron al mínimo</span>
+            </button>
+            <button class="tarjeta roja" type="button" data-filtro-estado="sin_stock">
+              <span>Sin stock</span>
+              <strong id="res-sin-stock">0</strong>
+              <span class="detalle-tarjeta">No queda nada</span>
+            </button>
+            <div class="tarjeta destacada">
+              <span>Valor del inventario</span>
+              <strong id="res-valor">$ 0</strong>
+              <span class="detalle-tarjeta">Lo que costó la mercadería que tenés</span>
+            </div>
+          </div>
+
+          <div class="barra-herramientas">
+            <input
+              id="buscador-productos"
+              class="buscador"
+              type="search"
+              placeholder="Buscar por nombre o código (también con el lector)…"
+              autocomplete="off"
+            />
+            <select id="filtro-categoria" title="Categoría">
+              <option value="">Todas las categorías</option>
+            </select>
+            <select id="filtro-estado-stock" title="Estado del stock">
+              <option value="todos">Todos los estados</option>
+              <option value="alerta">Para reponer</option>
+              <option value="bajo">Stock bajo</option>
+              <option value="sin_stock">Sin stock</option>
+              <option value="ok">Con stock</option>
+            </select>
+            <select id="filtro-mostrar-productos" title="Productos activos o dados de baja">
+              <option value="activos">Activos</option>
+              <option value="bajas">Dados de baja</option>
+              <option value="todos">Todos</option>
+            </select>
+            <span id="contador-productos" class="contador"></span>
+          </div>
+
+          <div class="dos-columnas">
+            <div class="panel panel-tabla">
+              <table class="tabla tabla-seleccionable">
+                <thead>
+                  <tr>
+                    <th>Producto</th>
+                    <th>Categoría</th>
+                    <th class="derecha">Stock</th>
+                    <th class="derecha">Mínimo</th>
+                    <th class="derecha">Precio</th>
+                    <th>Estado</th>
+                  </tr>
+                </thead>
+                <tbody id="tabla-productos"></tbody>
+              </table>
+              <p id="productos-vacio" class="vacio" hidden></p>
+            </div>
+
+            <aside id="detalle-producto" class="panel detalle"></aside>
+          </div>
+        </section>
+
+        <!-- ===== Vista: Categorías ===== -->
+        <section id="vista-categorias" class="vista" hidden>
+          <header class="encabezado-vista">
+            <h1>Categorías</h1>
+            <button id="btn-nueva-categoria" class="boton boton-primario" type="button">
+              + Nueva categoría
+            </button>
+          </header>
+
+          <label class="casilla">
+            <input id="categorias-inactivas" type="checkbox" />
+            Mostrar categorías desactivadas
+          </label>
+
+          <div class="panel panel-tabla">
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Categoría</th>
+                  <th class="derecha">Productos activos</th>
+                  <th>Estado</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tabla-categorias"></tbody>
+            </table>
+            <p id="categorias-vacio" class="vacio" hidden>
+              Todavía no hay categorías. Creá la primera, por ejemplo "Bebidas".
+            </p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- ===== Diálogo: producto ===== -->
+    <dialog id="dialogo-producto" class="dialogo dialogo-ancho">
+      <form id="form-producto" autocomplete="off">
+        <h2 id="titulo-producto">Nuevo producto</h2>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="producto-nombre">Nombre</label>
+            <input
+              id="producto-nombre"
+              name="nombre"
+              type="text"
+              maxlength="80"
+              placeholder="Yerba mate 1 kg"
+              required
+            />
+          </div>
+          <div class="campo">
+            <label for="producto-codigo">Código (opcional)</label>
+            <input
+              id="producto-codigo"
+              name="codigo"
+              type="text"
+              maxlength="40"
+              placeholder="Escribilo o pasá el lector"
+            />
+          </div>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="producto-categoria">Categoría</label>
+            <select id="producto-categoria" name="categoriaId"></select>
+          </div>
+          <div class="campo">
+            <label for="producto-unidad">Se vende por</label>
+            <select id="producto-unidad" name="unidad">
+              <option value="unidad">Unidad</option>
+              <option value="kg">Kilo (kg)</option>
+              <option value="litro">Litro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="fila-3">
+          <div class="campo">
+            <label for="producto-costo" data-etiqueta-unidad="Costo">Costo ($)</label>
+            <input id="producto-costo" name="costo" type="text" inputmode="decimal" placeholder="1.000" />
+          </div>
+          <div class="campo">
+            <label for="producto-ganancia">Ganancia (%)</label>
+            <input id="producto-ganancia" name="ganancia" type="text" inputmode="decimal" placeholder="40" />
+          </div>
+          <div class="campo campo-precio">
+            <label for="producto-precio" data-etiqueta-unidad="Precio de venta">Precio de venta ($)</label>
+            <input
+              id="producto-precio"
+              name="precio"
+              type="text"
+              inputmode="decimal"
+              placeholder="1.400"
+              required
+            />
+          </div>
+        </div>
+        <p class="ayuda">
+          Cargá el costo y el % de ganancia, y el precio se calcula solo. También podés escribir el
+          precio directamente.
+        </p>
+
+        <div class="fila">
+          <div class="campo">
+            <label for="producto-minimo" data-etiqueta-unidad="Stock mínimo">Stock mínimo</label>
+            <input id="producto-minimo" name="minimo" type="text" inputmode="decimal" placeholder="0" />
+          </div>
+          <div id="campo-stock-inicial" class="campo">
+            <label for="producto-inicial" data-etiqueta-unidad="Stock inicial">Stock inicial</label>
+            <input id="producto-inicial" name="inicial" type="text" inputmode="decimal" placeholder="0" />
+          </div>
+        </div>
+        <p id="ayuda-stock" class="ayuda">
+          Cuando el stock llega al mínimo, el producto aparece en "Para reponer".
+        </p>
+
+        <p id="error-producto" class="error-form"></p>
+
+        <div class="acciones">
+          <button class="boton boton-primario" type="submit">Guardar</button>
+          <button id="btn-cancelar-producto" class="boton boton-secundario" type="button">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- ===== Diálogo: categoría ===== -->
+    <dialog id="dialogo-categoria" class="dialogo">
+      <form id="form-categoria" autocomplete="off">
+        <h2 id="titulo-categoria">Nueva categoría</h2>
+        <div class="campo">
+          <label for="categoria-nombre">Nombre</label>
+          <input
+            id="categoria-nombre"
+            name="nombre"
+            type="text"
+            maxlength="40"
+            placeholder="Bebidas"
+            required
+          />
+        </div>
+        <p id="error-categoria" class="error-form"></p>
+        <div class="acciones">
+          <button class="boton boton-primario" type="submit">Guardar</button>
+          <button id="btn-cancelar-categoria" class="boton boton-secundario" type="button">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+
+    <!-- Mensaje flotante ("Producto guardado", errores...) -->
+    <div id="mensaje" class="mensaje" role="status" aria-live="polite"></div>
+
+    <!-- El orden importa: primero las herramientas, después lo que las usa -->
+    <script src="ui/utilidades.js"></script>
+    <script src="ui/app.js"></script>
+    <script src="ui/vista-productos.js"></script>
+    <script src="ui/vista-categorias.js"></script>
+  </body>
+</html>
