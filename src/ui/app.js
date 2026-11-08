@@ -3,6 +3,9 @@
 // Cada vista-*.js se registra acá. Ejemplo: vistas.productos = { alMostrar: cargar }
 const vistas = {};
 
+// Ajustes del negocio (se cargan al arrancar; Ajustes los actualiza)
+let configuracion = { nombre_negocio: 'Mi Almacén' };
+
 // ---------- Navegación ----------
 function mostrarVista(nombre) {
   for (const seccion of document.querySelectorAll('.vista')) {
@@ -81,7 +84,22 @@ function irAMovimientosDeProducto(producto) {
   mostrarVista('movimientos');
 }
 
-// Al arrancar, se abre la lista de productos
+// ---------- Nombre del negocio ----------
+// En el menú y en la barra de Windows
+function aplicarMarca() {
+  document.getElementById('marca-nombre').textContent = configuracion.nombre_negocio;
+  document.title = `${configuracion.nombre_negocio} — Control de stock`;
+}
+
+async function cargarConfiguracion() {
+  const datos = await pedir(window.api.obtenerConfiguracion());
+  if (datos === null) return;
+  configuracion = datos;
+  aplicarMarca();
+}
+
+// Al arrancar: el nombre del negocio y la lista de productos
 document.addEventListener('DOMContentLoaded', () => {
+  cargarConfiguracion();
   mostrarVista('productos');
 });

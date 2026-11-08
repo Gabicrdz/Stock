@@ -23,7 +23,7 @@
             <path d="M6 6.5l2-4h10l2 4" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" />
           </svg>
           <div>
-            <strong>Mi Almacén</strong>
+            <strong id="marca-nombre">Mi Almacén</strong>
             <small>Control de stock</small>
           </div>
         </div>
@@ -35,6 +35,10 @@
           <button class="nav-boton" type="button" data-vista="movimientos">Movimientos</button>
           <button class="nav-boton" type="button" data-vista="reportes">Reportes</button>
           <button class="nav-boton" type="button" data-vista="categorias">Categorías</button>
+        </nav>
+        <!-- Ajustes queda abajo de todo, separado del trabajo diario -->
+        <nav class="menu menu-abajo" aria-label="Ajustes">
+          <button class="nav-boton" type="button" data-vista="ajustes">Ajustes</button>
         </nav>
       </aside>
 
@@ -341,6 +345,68 @@
           </section>
         </section>
 
+        <!-- ===== Vista: Ajustes ===== -->
+        <section id="vista-ajustes" class="vista vista-angosta" hidden>
+          <header class="encabezado-vista">
+            <div>
+              <h1>Ajustes</h1>
+              <p class="bajada">El nombre del negocio, las copias de seguridad y los datos del sistema.</p>
+            </div>
+          </header>
+
+          <section class="reporte">
+            <h2>Negocio</h2>
+            <form id="form-nombre-negocio" class="form-en-linea" autocomplete="off">
+              <div class="campo">
+                <label for="nombre-negocio">Nombre</label>
+                <input id="nombre-negocio" name="nombre" type="text" maxlength="40" required />
+              </div>
+              <button class="boton boton-primario" type="submit">Guardar</button>
+            </form>
+            <p class="bajada-reporte">Aparece en el menú, en la barra de Windows y en los pedidos al proveedor.</p>
+            <p id="error-nombre-negocio" class="error-form"></p>
+          </section>
+
+          <section class="reporte">
+            <div class="reporte-titulo">
+              <div>
+                <h2>Copias de seguridad</h2>
+                <p class="bajada-reporte">
+                  Se hace una copia sola todos los días, al abrir y al cerrar el sistema. Se guardan las
+                  últimas 30. Conviene elegir una carpeta de Google Drive o OneDrive, así también quedan
+                  en la nube.
+                </p>
+              </div>
+            </div>
+            <p class="carpeta-copias">Se guardan en <code id="copias-carpeta"></code></p>
+            <p id="copias-aviso" class="aviso-copias" hidden></p>
+            <div class="acciones acciones-copias">
+              <button id="btn-copia-ahora" class="boton boton-primario" type="button">Hacer copia ahora</button>
+              <button id="btn-carpeta-copias" class="boton boton-secundario" type="button">Cambiar carpeta</button>
+              <button id="btn-restaurar-archivo" class="boton boton-secundario" type="button">
+                Restaurar desde un archivo…
+              </button>
+            </div>
+            <table class="tabla tabla-compacta">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Tipo</th>
+                  <th class="derecha">Tamaño</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tabla-copias"></tbody>
+            </table>
+            <p id="copias-vacio" class="vacio" hidden>Todavía no hay copias en esta carpeta.</p>
+          </section>
+
+          <section class="reporte">
+            <h2>Sistema</h2>
+            <dl id="info-sistema" class="lista-datos lista-sistema"></dl>
+          </section>
+        </section>
+
         <!-- ===== Vista: Categorías ===== -->
         <section id="vista-categorias" class="vista" hidden>
           <header class="encabezado-vista">
@@ -590,6 +656,7 @@
     <script src="ui/vista-productos.js"></script>
     <script src="ui/vista-movimientos.js"></script>
     <script src="ui/vista-reportes.js"></script>
+    <script src="ui/vista-ajustes.js"></script>
     <script src="ui/vista-categorias.js"></script>
   </body>
 </html>

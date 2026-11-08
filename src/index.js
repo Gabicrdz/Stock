@@ -8,6 +8,8 @@ const categorias = require('./db/categorias');
 const productos = require('./db/productos');
 const movimientos = require('./db/movimientos');
 const reportes = require('./db/reportes');
+const configuracion = require('./db/configuracion');
+const copias = require('./db/copias');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -80,6 +82,74 @@ manejar('sistema:whatsapp', async (texto) => {
   return true;
 });
 
+// ---------- Ajustes ----------
+manejar('configuracion:obtener', () => configuracion.obtenerConfiguracion());
+manejar('configuracion:guardar', (datos) => configuracion.guardarConfiguracion(datos));
+
+// ---------- Copias de seguridad ----------
+manejar('copias:listar', () => copias.listarCopias());
+manejar('copias:hacer', () => copias.hacerCopia('manual'));
+
+manejar('copias:elegir-carpeta', async () => {
+  const resultado = await dialog.showOpenDialog(ventana, {
+    title: 'Elegí dónde guardar las copias de seguridad',
+    defaultPath: copias.carpetaDeCopias(),
+    properties: ['openDirectory', 'createDirectory'],
+  });
+  if (resultado.canceled || resultado.filePaths.length === 0) return null;
+  return copias.cambiarCarpeta(resultado.filePaths[0]);
+});
+
+// Restaurar: la ventana manda el nombre de una copia de la lista,
+// o null para elegir un archivo con el explorador de Windows.
+manejar('copias:restaurar', async (nombre) => {
+  let ruta;
+  if (nombre) {
+    ruta = copias.rutaDeCopia(nombre);
+  } else {
+    const resultado = await dialog.showOpenDialog(ventana, {
+      title: 'Elegí la copia de seguridad a restaurar',
+      defaultPath: copias.carpetaDeCopias(),
+      properties: ['openFile'],
+      filters: [{ name: 'Copias de seguridad', extensions: ['db'] }],
+    });
+    if (resultado.canceled || resultado.filePaths.length === 0) return { cancelado: true };
+    ruta = resultado.filePaths[0];
+  }
+
+  // La confirmación la pide el main: es una acción que reemplaza TODOS los datos
+  const info = copias.validarArchivoDeCopia(ruta);
+  const { response } = await dialog.showMessageBox(ventana, {
+    type: 'warning',
+    title: 'Restaurar copia de seguridad',
+    message: '¿Reemplazar TODOS los datos actuales por los de esta copia?',
+    detail:
+      `La copia tiene ${info.productos} productos. Antes de reemplazar se guarda una copia ` +
+      'de cómo está todo ahora, por si te arrepentís. El programa se va a reiniciar.',
+    buttons: ['Restaurar', 'Cancelar'],
+    defaultId: 1,
+    cancelId: 1,
+    noLink: true,
+  });
+  if (response !== 0) return { cancelado: true };
+
+  const resultado = copias.restaurarCopia(ruta);
+
+  // Reiniciamos para abrir la base restaurada (y aplicarle las migraciones que falten).
+  // El pequeño retraso deja que la respuesta llegue a la ventana.
+  setTimeout(() => {
+    app.relaunch();
+    app.exit(0);
+  }, 400);
+  return { ...resultado, reiniciando: true };
+});
+
+manejar('sistema:info', () => ({
+  versionPrograma: app.getVersion(),
+  versionBase: conexion.VERSION_BASE,
+  carpetaDatos: app.getPath('userData'),
+}));
+
 // ---------- Confirmación genérica ----------
 manejar('dialogo:confirmar', async (opciones) => {
   const { titulo = 'Confirmar', mensaje = '¿Seguro?', detalle = '', boton = 'Aceptar' } =
@@ -105,6 +175,7 @@ function crearVentana() {
     height: 800,
     minWidth: 1000,
     minHeight: 640,
+    icon: path.join(__dirname, '..', 'assets', 'icono.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -127,6 +198,7 @@ function crearVentana() {
 
 app.whenReady().then(() => {
   conexion.iniciarBaseDeDatos();
+  copias.copiaAutomatica({ soloSiNoHayDeHoy: true }); // si falla, avisa en Ajustes
   crearVentana();
 });
 
@@ -134,6 +206,9 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') app.quit();
 });
 
+// Al cerrar: actualiza la copia del día con todo lo que se hizo hoy
 app.on('will-quit', () => {
+  if (!conexion.baseAbierta()) return; // por ejemplo, justo después de restaurar
+  copias.copiaAutomatica({ soloSiNoHayDeHoy: false });
   conexion.cerrarBaseDeDatos();
 });

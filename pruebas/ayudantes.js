@@ -16,6 +16,8 @@ function iniciarSistema() {
     productos: cargar('db/productos'),
     movimientos: cargar('db/movimientos'),
     reportes: cargar('db/reportes'),
+    configuracion: cargar('db/configuracion'),
+    copias: cargar('db/copias'),
   };
 }
 

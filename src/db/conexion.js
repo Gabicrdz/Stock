@@ -80,6 +80,18 @@ const MIGRACIONES = [
     `);
   },
 
+  // ===== Versión 3 (etapa 4): ajustes del sistema =====
+  // Pares clave → valor: agregar un ajuste nuevo no necesita cambiar la tabla.
+  () => {
+    db.exec(`
+      CREATE TABLE configuracion (
+        clave TEXT PRIMARY KEY,
+        valor TEXT NOT NULL
+      );
+      INSERT INTO configuracion (clave, valor) VALUES ('nombre_negocio', 'Mi Almacén');
+    `);
+  },
+
   // Las próximas migraciones van acá abajo.
 ];
 
@@ -127,6 +139,10 @@ function cerrarBaseDeDatos() {
   db = null;
 }
 
+function baseAbierta() {
+  return db !== null;
+}
+
 const VERSION_BASE = MIGRACIONES.length;
 
 // ---------- Ayudantes para validar ----------
@@ -147,6 +163,12 @@ function hoy() {
   const mes = String(fecha.getMonth() + 1).padStart(2, '0');
   const dia = String(fecha.getDate()).padStart(2, '0');
   return `${fecha.getFullYear()}-${mes}-${dia}`;
+}
+
+// Hora de la compu como "HH:MM"
+function horaActual() {
+  const fecha = new Date();
+  return `${String(fecha.getHours()).padStart(2, '0')}:${String(fecha.getMinutes()).padStart(2, '0')}`;
 }
 
 // "2026-02-31" tiene buen formato pero no existe. SQLite no avisa:
@@ -184,11 +206,13 @@ module.exports = {
   iniciarBaseDeDatos,
   obtenerDb,
   cerrarBaseDeDatos,
+  baseAbierta,
   rutaBaseDeDatos,
   VERSION_BASE,
   texto,
   validarId,
   hoy,
+  horaActual,
   normalizar,
   escaparLike,
   fechaObligatoria,

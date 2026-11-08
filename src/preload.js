@@ -31,6 +31,17 @@ contextBridge.exposeInMainWorld('api', {
   copiarTexto: (texto) => ipcRenderer.invoke('sistema:copiar', texto),
   enviarPorWhatsApp: (texto) => ipcRenderer.invoke('sistema:whatsapp', texto),
 
+  // Ajustes
+  obtenerConfiguracion: () => ipcRenderer.invoke('configuracion:obtener'),
+  guardarConfiguracion: (datos) => ipcRenderer.invoke('configuracion:guardar', datos),
+
+  // Copias de seguridad
+  listarCopias: () => ipcRenderer.invoke('copias:listar'),
+  hacerCopia: () => ipcRenderer.invoke('copias:hacer'),
+  elegirCarpetaCopias: () => ipcRenderer.invoke('copias:elegir-carpeta'),
+  restaurarCopia: (nombre) => ipcRenderer.invoke('copias:restaurar', nombre ?? null),
+  infoSistema: () => ipcRenderer.invoke('sistema:info'),
+
   // Diálogos
   confirmar: (opciones) => ipcRenderer.invoke('dialogo:confirmar', opciones),
 });

@@ -1,6 +1,6 @@
 {
   "name": "stock",
-  "productName": "stock",
+  "productName": "Control de Stock",
   "version": "1.0.0",
   "private": true,
   "description": "Sistema de control de stock: productos, categorías, movimientos y alertas de reposición",

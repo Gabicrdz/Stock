@@ -1514,3 +1514,77 @@ h3 {
     display: none;
   }
 }
+
+/* =====================================================================
+   ETAPA 4 — Ajustes y copias de seguridad
+   ===================================================================== */
+
+/* Ajustes queda al pie del menú */
+.menu-abajo {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--regla);
+}
+
+/* Pantallas de lectura (Ajustes): más angostas, como una hoja */
+.vista-angosta {
+  max-width: 860px;
+  margin: 0;
+}
+
+.vista-angosta > .reporte + .reporte {
+  padding-top: 28px;
+  border-top: 1px solid var(--regla);
+}
+
+.vista-angosta .reporte h2 {
+  margin-bottom: 14px;
+}
+
+/* Campo y botón en la misma línea */
+.form-en-linea {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  max-width: 520px;
+}
+
+.form-en-linea .campo {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-en-linea + .bajada-reporte {
+  margin: 10px 0 0;
+}
+
+.carpeta-copias {
+  margin: 0 0 8px;
+  color: var(--texto-suave);
+  font-size: 0.88rem;
+}
+
+.carpeta-copias code,
+.lista-sistema dd {
+  color: var(--tinta);
+  font-family: Consolas, 'Cascadia Mono', monospace;
+  font-size: 0.82rem;
+  word-break: break-all;
+}
+
+.aviso-copias {
+  margin: 8px 0;
+  padding: 10px 14px;
+  border-left: 2px solid var(--sin-punto);
+  background: #fbefed;
+  color: var(--sin);
+  font-size: 0.88rem;
+}
+
+.acciones-copias {
+  margin: 14px 0 18px;
+}
+
+.lista-sistema dd {
+  max-width: 60%;
+}

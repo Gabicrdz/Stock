@@ -221,7 +221,7 @@
   function textoDelPedido() {
     const elegidos = listaDeCompras.filter((p) => p.incluir);
     if (elegidos.length === 0) return null;
-    const renglones = [`Pedido de Mi Almacén — ${fechaCorta(hoyISO())}`];
+    const renglones = [`Pedido de ${configuracion.nombre_negocio} — ${fechaCorta(hoyISO())}`];
     let categoria = null;
     for (const p of elegidos) {
       if (p.categoria !== categoria) {
@@ -251,7 +251,8 @@
 
   // Imprimir: con la clase "imprimiendo-lista" en el body, el CSS esconde todo lo demás
   document.getElementById('btn-compras-imprimir').addEventListener('click', () => {
-    document.getElementById('compras-fecha').textContent = `Pedido del ${fechaCorta(hoyISO())}`;
+    document.getElementById('compras-fecha').textContent =
+      `${configuracion.nombre_negocio} · Pedido del ${fechaCorta(hoyISO())}`;
     document.body.classList.add('imprimiendo-lista');
     window.print();
     document.body.classList.remove('imprimiendo-lista');
