@@ -1243,3 +1243,274 @@ h3 {
 .vista-previa.alerta {
   color: var(--sin);
 }
+
+/* =====================================================================
+   ETAPA 3 — Reportes
+   ===================================================================== */
+
+/* Atajos de período: "7 días", "30 días", "Este mes"… */
+.atajos {
+  display: flex;
+  gap: 4px;
+  margin-right: 8px;
+}
+
+.atajo {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid transparent;
+  border-radius: 17px;
+  background: transparent;
+  color: var(--texto-suave);
+  font-size: 0.86rem;
+  font-weight: 500;
+}
+
+.atajo:hover {
+  color: var(--tinta);
+  border-color: var(--regla-fuerte);
+}
+
+.atajo.activo {
+  border-color: var(--tinta);
+  background: var(--tinta);
+  color: #fff;
+}
+
+/* Dos reportes uno al lado del otro */
+.reportes-grilla {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 48px;
+}
+
+.reporte h2 {
+  font-size: 1.35rem;
+}
+
+.bajada-reporte {
+  margin: 4px 0 16px;
+  color: var(--texto-tenue);
+  font-size: 0.86rem;
+}
+
+.reporte-titulo {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.total-reporte {
+  margin: 0;
+  color: var(--tinta);
+  font-family: var(--titulos);
+  font-size: 1.35rem;
+}
+
+.acciones-reporte {
+  display: flex;
+  gap: 8px;
+}
+
+/* Nombre de producto que lleva a su ficha: parece texto, se subraya al pasar */
+.enlace-producto {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--tinta);
+  font-weight: 500;
+  text-align: left;
+}
+
+.enlace-producto:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* ---------- Ranking de lo más vendido ---------- */
+.ranking {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: puesto;
+}
+
+.ranking li {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 10px 0 10px 32px;
+  border-bottom: 1px solid var(--regla);
+  counter-increment: puesto;
+}
+
+/* El número de puesto, en Lora */
+.ranking li::before {
+  content: counter(puesto);
+  position: absolute;
+  top: 9px;
+  left: 0;
+  color: var(--texto-tenue);
+  font-family: var(--titulos);
+  font-size: 1.05rem;
+  font-variant-numeric: lining-nums;
+}
+
+.ranking-fila {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ranking-fila strong {
+  color: var(--tinta);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.ranking-detalle {
+  color: var(--texto-tenue);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.barra-reporte {
+  display: block;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--suave);
+}
+
+.barra-reporte > span {
+  display: block;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--tinta);
+}
+
+.tabla-compacta td {
+  padding: 10px 12px;
+}
+
+.tabla-compacta td .barra-reporte {
+  margin-top: 6px;
+  max-width: 160px;
+}
+
+/* ---------- Lista de compras ---------- */
+.tabla-compras th:first-child,
+.tabla-compras td:first-child {
+  width: 36px;
+}
+
+.fila-categoria td {
+  padding-top: 18px;
+  color: var(--texto-tenue);
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.tabla-compras tr.excluida td:not(:first-child) {
+  opacity: 0.4;
+}
+
+.estado-compra {
+  margin-left: 10px;
+  font-size: 0.78rem;
+}
+
+.estado-compra.roja {
+  color: var(--sin);
+}
+
+.estado-compra.amarilla {
+  color: var(--bajo);
+}
+
+.celda-pedir {
+  white-space: nowrap;
+}
+
+.campo-pedir {
+  width: 84px;
+  min-height: 34px;
+  padding: 4px 8px;
+  text-align: right;
+  font-weight: 600;
+}
+
+.campo-pedir.invalido {
+  border-color: var(--sin);
+}
+
+.unidad-pedir {
+  display: inline-block;
+  width: 28px;
+  margin-left: 6px;
+  color: var(--texto-tenue);
+  font-size: 0.8rem;
+  text-align: left;
+}
+
+.tabla-compras tfoot td {
+  padding-top: 14px;
+  border-bottom: none;
+  border-top: 1px solid var(--regla-fuerte);
+  color: var(--tinta);
+  font-weight: 600;
+}
+
+/* Solo para lectores de pantalla (invisible en la pantalla) */
+.solo-lectores {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+}
+
+.solo-imprimir {
+  display: none;
+}
+
+/* ---------- Impresión de la lista de compras ---------- */
+@media print {
+  @page {
+    margin: 16mm;
+  }
+
+  /* Al imprimir la lista, se esconde todo lo demás */
+  body.imprimiendo-lista .lateral,
+  body.imprimiendo-lista .vista:not(#vista-reportes),
+  body.imprimiendo-lista #vista-reportes > :not(#reporte-compras),
+  body.imprimiendo-lista .no-imprimir,
+  body.imprimiendo-lista .mensaje {
+    display: none !important;
+  }
+
+  body.imprimiendo-lista .app {
+    display: block;
+    height: auto;
+  }
+
+  body.imprimiendo-lista .contenido {
+    padding: 0;
+    overflow: visible;
+  }
+
+  body.imprimiendo-lista .solo-imprimir {
+    display: block;
+  }
+
+  /* Las cantidades se imprimen como texto, sin la cajita del campo */
+  body.imprimiendo-lista .campo-pedir {
+    border: none;
+    padding: 0;
+  }
+
+  body.imprimiendo-lista tr.excluida {
+    display: none;
+  }
+}

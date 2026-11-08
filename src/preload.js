@@ -24,6 +24,13 @@ contextBridge.exposeInMainWorld('api', {
     ipcRenderer.invoke('movimientos:de-producto', productoId, limite),
   listarMovimientos: (filtros) => ipcRenderer.invoke('movimientos:listar', filtros),
 
+  // Reportes
+  obtenerReportes: (filtros) => ipcRenderer.invoke('reportes:obtener', filtros),
+
+  // Compartir
+  copiarTexto: (texto) => ipcRenderer.invoke('sistema:copiar', texto),
+  enviarPorWhatsApp: (texto) => ipcRenderer.invoke('sistema:whatsapp', texto),
+
   // Diálogos
   confirmar: (opciones) => ipcRenderer.invoke('dialogo:confirmar', opciones),
 });

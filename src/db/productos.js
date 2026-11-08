@@ -223,6 +223,7 @@ function cambiarEstadoProducto(id, activo) {
 }
 
 module.exports = {
+  CON_STOCK, // la usan los reportes
   listarProductos,
   obtenerProducto,
   resumenStock,

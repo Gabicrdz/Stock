@@ -69,6 +69,12 @@ function irAProductosDeCategoria(categoriaId) {
   mostrarVista('productos');
 }
 
+// Abre la ficha de un producto (por ejemplo, desde Reportes)
+function irAProducto(id) {
+  vistas.productos.mostrarProducto(id);
+  mostrarVista('productos');
+}
+
 // Abre Movimientos con los de un solo producto (desde su ficha)
 function irAMovimientosDeProducto(producto) {
   vistas.movimientos.filtrarPorProducto(producto);

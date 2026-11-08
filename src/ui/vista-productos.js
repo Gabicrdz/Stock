@@ -525,6 +525,14 @@
       await cargarCategoriasFiltro();
       cargar();
     },
+    // Abre la ficha de un producto, sacando los filtros para que se vea en la lista
+    mostrarProducto: (id) => {
+      idSeleccionado = id;
+      buscador.value = '';
+      filtroCategoria.value = '';
+      filtroEstado.value = 'todos';
+      filtroMostrar.value = 'activos';
+    },
     filtrarPorCategoria: (categoriaId) => {
       // La lista de categorías se recarga al mostrar la vista; dejamos anotado cuál elegir
       filtroCategoria.replaceChildren(crear('option', { valor: categoriaId, texto: '' }));

@@ -33,6 +33,7 @@
             <span id="aviso-reponer" class="aviso-pestana" title="Productos para reponer" hidden></span>
           </button>
           <button class="nav-boton" type="button" data-vista="movimientos">Movimientos</button>
+          <button class="nav-boton" type="button" data-vista="reportes">Reportes</button>
           <button class="nav-boton" type="button" data-vista="categorias">Categorías</button>
         </nav>
       </aside>
@@ -201,6 +202,143 @@
             </table>
             <p id="movimientos-vacio" class="vacio" hidden></p>
           </div>
+        </section>
+
+        <!-- ===== Vista: Reportes ===== -->
+        <section id="vista-reportes" class="vista" hidden>
+          <header class="encabezado-vista">
+            <div>
+              <h1>Reportes</h1>
+              <p class="bajada">Qué se vende, cuánto deja y qué hay que pedir.</p>
+            </div>
+          </header>
+
+          <!-- Período: atajos + fechas -->
+          <div class="barra-herramientas periodo">
+            <div class="atajos" role="group" aria-label="Período">
+              <button class="atajo" type="button" data-periodo="7">7 días</button>
+              <button class="atajo" type="button" data-periodo="30">30 días</button>
+              <button class="atajo" type="button" data-periodo="mes">Este mes</button>
+              <button class="atajo" type="button" data-periodo="mes-anterior">Mes anterior</button>
+            </div>
+            <label class="campo-fecha">
+              Desde
+              <input id="rep-desde" type="date" />
+            </label>
+            <label class="campo-fecha">
+              Hasta
+              <input id="rep-hasta" type="date" />
+            </label>
+          </div>
+
+          <div class="indicadores">
+            <div class="indicador">
+              <strong id="rep-vendido">$ 0</strong>
+              <span>Vendido</span>
+            </div>
+            <div class="indicador">
+              <strong id="rep-costo">$ 0</strong>
+              <span>Costo de lo vendido</span>
+            </div>
+            <div class="indicador">
+              <strong id="rep-ganancia">$ 0</strong>
+              <span id="rep-ganancia-detalle">Ganancia</span>
+            </div>
+            <div class="indicador">
+              <strong id="rep-ventas">0</strong>
+              <span>Ventas registradas</span>
+            </div>
+          </div>
+
+          <div class="reportes-grilla">
+            <section class="reporte">
+              <h2>Lo que más se vende</h2>
+              <p class="bajada-reporte">Los 10 productos que más plata hicieron en el período.</p>
+              <ol id="rep-mas-vendidos" class="ranking"></ol>
+              <p id="rep-mas-vendidos-vacio" class="vacio" hidden>No hubo ventas en este período.</p>
+            </section>
+
+            <section class="reporte">
+              <h2>Ganancia por categoría</h2>
+              <p class="bajada-reporte">Ganancia = lo cobrado menos lo que costó la mercadería vendida.</p>
+              <table class="tabla tabla-compacta">
+                <thead>
+                  <tr>
+                    <th>Categoría</th>
+                    <th class="derecha">Vendido</th>
+                    <th class="derecha">Ganancia</th>
+                    <th class="derecha" title="Cuánto se ganó sobre lo que costó">Sobre el costo</th>
+                  </tr>
+                </thead>
+                <tbody id="rep-categorias"></tbody>
+              </table>
+              <p id="rep-categorias-vacio" class="vacio" hidden>No hubo ventas en este período.</p>
+            </section>
+          </div>
+
+          <section class="reporte">
+            <div class="reporte-titulo">
+              <div>
+                <h2>Mercadería parada</h2>
+                <p class="bajada-reporte">
+                  Hay stock pero no se vendió nada en el período: es plata quieta en el estante.
+                </p>
+              </div>
+              <p id="rep-parado-total" class="total-reporte"></p>
+            </div>
+            <table class="tabla tabla-compacta">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th class="derecha">Hay</th>
+                  <th>Última venta</th>
+                  <th class="derecha">Valor al costo</th>
+                </tr>
+              </thead>
+              <tbody id="rep-parados"></tbody>
+            </table>
+            <p id="rep-parados-vacio" class="vacio" hidden>Todo lo que hay se vendió al menos una vez en el período.</p>
+          </section>
+
+          <!-- Lista de compras: es lo único que se imprime -->
+          <section id="reporte-compras" class="reporte">
+            <div class="reporte-titulo">
+              <div>
+                <h2>Lista de compras</h2>
+                <p class="bajada-reporte no-imprimir">
+                  Lo que llegó al mínimo. Se sugiere pedir hasta tener el triple del mínimo: podés
+                  cambiar las cantidades y destildar lo que no quieras pedir.
+                </p>
+                <p id="compras-fecha" class="bajada-reporte solo-imprimir"></p>
+              </div>
+              <div class="acciones-reporte no-imprimir">
+                <button id="btn-compras-copiar" class="boton boton-secundario" type="button">Copiar</button>
+                <button id="btn-compras-whatsapp" class="boton boton-secundario" type="button">WhatsApp</button>
+                <button id="btn-compras-imprimir" class="boton boton-primario" type="button">Imprimir</button>
+              </div>
+            </div>
+            <table class="tabla tabla-compacta tabla-compras">
+              <thead>
+                <tr>
+                  <th class="no-imprimir"><span class="solo-lectores">Pedir</span></th>
+                  <th>Producto</th>
+                  <th class="derecha">Hay</th>
+                  <th class="derecha">Mínimo</th>
+                  <th class="derecha">Pedir</th>
+                  <th class="derecha">Costo estimado</th>
+                </tr>
+              </thead>
+              <tbody id="rep-compras"></tbody>
+              <tfoot>
+                <tr>
+                  <td class="no-imprimir"></td>
+                  <td colspan="4">Total estimado</td>
+                  <td id="rep-compras-total" class="derecha"></td>
+                </tr>
+              </tfoot>
+            </table>
+            <p id="rep-compras-vacio" class="vacio" hidden>No hay nada para reponer: todo está por encima del mínimo.</p>
+          </section>
         </section>
 
         <!-- ===== Vista: Categorías ===== -->
@@ -451,6 +589,7 @@
     <script src="ui/dialogo-movimiento.js"></script>
     <script src="ui/vista-productos.js"></script>
     <script src="ui/vista-movimientos.js"></script>
+    <script src="ui/vista-reportes.js"></script>
     <script src="ui/vista-categorias.js"></script>
   </body>
 </html>

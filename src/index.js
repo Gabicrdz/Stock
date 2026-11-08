@@ -1,12 +1,13 @@
 // index.js — Proceso MAIN del sistema de stock.
 // Abre la ventana, la base de datos, y atiende los pedidos de la ventana (IPC).
 
-const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const { app, BrowserWindow, ipcMain, dialog, clipboard, shell } = require('electron');
 const path = require('node:path');
 const conexion = require('./db/conexion');
 const categorias = require('./db/categorias');
 const productos = require('./db/productos');
 const movimientos = require('./db/movimientos');
+const reportes = require('./db/reportes');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -54,6 +55,30 @@ manejar('movimientos:registrar', (datos) => movimientos.registrarMovimiento(dato
 manejar('movimientos:anular', (id) => movimientos.anularMovimiento(id));
 manejar('movimientos:de-producto', (productoId, limite) => movimientos.historialDeProducto(productoId, limite));
 manejar('movimientos:listar', (filtros) => movimientos.listarMovimientos(filtros));
+
+// ---------- Reportes ----------
+manejar('reportes:obtener', (filtros) => reportes.obtenerReportes(filtros));
+
+// ---------- Compartir la lista de compras ----------
+// Solo aceptamos TEXTO. La dirección de WhatsApp la arma el main:
+// la ventana nunca decide qué página se abre.
+function textoParaCompartir(texto) {
+  const limpio = String(texto ?? '').trim();
+  if (!limpio) throw new Error('No hay nada para compartir');
+  if (limpio.length > 6000) throw new Error('La lista es demasiado larga para mandarla de una vez');
+  return limpio;
+}
+
+manejar('sistema:copiar', (texto) => {
+  clipboard.writeText(textoParaCompartir(texto));
+  return true;
+});
+
+// wa.me sin número: WhatsApp se abre y pregunta a qué contacto mandarlo
+manejar('sistema:whatsapp', async (texto) => {
+  await shell.openExternal(`https://wa.me/?text=${encodeURIComponent(textoParaCompartir(texto))}`);
+  return true;
+});
 
 // ---------- Confirmación genérica ----------
 manejar('dialogo:confirmar', async (opciones) => {
