@@ -56,11 +56,23 @@ function actualizarAvisoReponer(resumen) {
   aviso.hidden = cantidad === 0;
 }
 
+// Pide el resumen y actualiza el aviso (después de registrar o anular un movimiento)
+async function refrescarAvisoReponer() {
+  const resumen = await pedir(window.api.resumenStock());
+  if (resumen !== null) actualizarAvisoReponer(resumen);
+}
+
 // ---------- Saltar de una pantalla a otra ----------
 // Abre Productos filtrado por una categoría (desde la pantalla de Categorías)
 function irAProductosDeCategoria(categoriaId) {
   vistas.productos.filtrarPorCategoria(categoriaId);
   mostrarVista('productos');
+}
+
+// Abre Movimientos con los de un solo producto (desde su ficha)
+function irAMovimientosDeProducto(producto) {
+  vistas.movimientos.filtrarPorProducto(producto);
+  mostrarVista('movimientos');
 }
 
 // Al arrancar, se abre la lista de productos

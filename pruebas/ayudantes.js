@@ -14,10 +14,20 @@ function iniciarSistema() {
     conexion,
     categorias: cargar('db/categorias'),
     productos: cargar('db/productos'),
+    movimientos: cargar('db/movimientos'),
   };
 }
 
 // Cantidades: 1 unidad = 1000 milésimas
 const u = (cantidad) => Math.round(cantidad * 1000);
 
-module.exports = { carpeta, DatabaseSync, cargar, iniciarSistema, u };
+// Fecha "AAAA-MM-DD" a X días de hoy (negativo = en el pasado), calculada igual que el sistema
+function fechaDesdeHoy(dias) {
+  const fecha = new Date();
+  fecha.setHours(12, 0, 0, 0);
+  fecha.setDate(fecha.getDate() + dias);
+  const dos = (n) => String(n).padStart(2, '0');
+  return `${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}`;
+}
+
+module.exports = { carpeta, DatabaseSync, cargar, iniciarSistema, u, fechaDesdeHoy };

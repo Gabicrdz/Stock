@@ -72,7 +72,7 @@
     document.getElementById('res-activos').textContent = resumen.activos;
     document.getElementById('res-bajo').textContent = resumen.bajo;
     document.getElementById('res-sin-stock').textContent = resumen.sinStock;
-    document.getElementById('res-valor').textContent = pesos(resumen.valorInventarioCentavos);
+    document.getElementById('res-valor').textContent = pesosRedondo(resumen.valorInventarioCentavos);
     actualizarAvisoReponer(resumen);
 
     // Los números de alerta se pintan solo si hay algo que avisar
@@ -176,9 +176,41 @@
     return producto.stock_minimo ? `El mínimo es ${minimo}` : 'No tiene stock mínimo cargado';
   }
 
+  // Últimos movimientos del producto, con el saldo después de cada uno
+  function renderHistorial(producto, historial) {
+    if (historial.length === 0) {
+      return crear('p', { clase: 'texto-tenue', texto: 'Todavía no tiene movimientos.' });
+    }
+    return crear(
+      'ul',
+      { clase: 'historial' },
+      historial.map((m) =>
+        crear('li', { clase: m.anulado ? 'anulado' : '' }, [
+          crear('span', { clase: 'historial-tipo' }, [
+            crear('strong', { texto: TIPOS_MOVIMIENTO[m.tipo].nombre }),
+            crear('span', { texto: m.anulado ? `${fechaCorta(m.fecha)} · anulado` : fechaCorta(m.fecha) }),
+          ]),
+          crear('span', {
+            clase: `historial-cantidad ${m.cantidad > 0 ? 'entra' : 'sale'}`,
+            texto: cantidadConSigno(m.cantidad, producto.unidad),
+          }),
+          crear('span', {
+            clase: 'historial-saldo',
+            titulo: 'Stock después de este movimiento',
+            texto: m.anulado ? '' : numeroCantidad(m.saldo),
+          }),
+        ])
+      )
+    );
+  }
+
   async function mostrarDetalle(id) {
-    const producto = await pedir(window.api.obtenerProducto(id));
-    if (producto === null) {
+    // Pedimos el producto y sus movimientos AL MISMO TIEMPO
+    const [producto, historial] = await Promise.all([
+      pedir(window.api.obtenerProducto(id)),
+      pedir(window.api.historialDeProducto(id, 6)),
+    ]);
+    if (producto === null || historial === null) {
       idSeleccionado = null;
       renderDetalleVacio();
       return;
@@ -217,6 +249,46 @@
           ? insigniaStock(producto.estado_stock)
           : crear('span', { clase: 'insignia gris', texto: 'Dado de baja' }),
         crear('p', { clase: 'existencia-texto', texto: textoExistencia(producto) }),
+      ]),
+
+      // Mover stock: lo que más se usa en el día a día
+      producto.activo
+        ? crear('div', { clase: 'botones-movimiento' }, [
+            crear('button', {
+              tipo: 'button',
+              clase: 'boton boton-primario',
+              texto: 'Entrada',
+              titulo: 'Compra o devolución',
+              alClick: () => abrirMovimiento({ producto, grupo: 'entrada', alGuardar: cargar }),
+            }),
+            crear('button', {
+              tipo: 'button',
+              clase: 'boton boton-secundario',
+              texto: 'Salida',
+              titulo: 'Venta o merma',
+              alClick: () => abrirMovimiento({ producto, grupo: 'salida', alGuardar: cargar }),
+            }),
+            crear('button', {
+              tipo: 'button',
+              clase: 'boton boton-secundario',
+              texto: 'Contar',
+              titulo: 'Ajustar el stock a lo que hay en el estante',
+              alClick: () => abrirMovimiento({ producto, grupo: 'ajuste', alGuardar: cargar }),
+            }),
+          ])
+        : crear('p', { clase: 'texto-tenue', texto: 'Para moverle stock, primero reactivalo.' }),
+
+      crear('section', { clase: 'seccion-ficha' }, [
+        crear('div', { clase: 'seccion-ficha-titulo' }, [
+          crear('h3', { texto: 'Últimos movimientos' }),
+          crear('button', {
+            tipo: 'button',
+            clase: 'boton-texto',
+            texto: 'Ver todos',
+            alClick: () => irAMovimientosDeProducto(producto),
+          }),
+        ]),
+        renderHistorial(producto, historial),
       ]),
 
       crear('dl', { clase: 'lista-datos' }, [

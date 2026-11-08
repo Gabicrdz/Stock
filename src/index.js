@@ -6,6 +6,7 @@ const path = require('node:path');
 const conexion = require('./db/conexion');
 const categorias = require('./db/categorias');
 const productos = require('./db/productos');
+const movimientos = require('./db/movimientos');
 
 if (require('electron-squirrel-startup')) {
   app.quit();
@@ -47,6 +48,12 @@ manejar('productos:resumen', () => productos.resumenStock());
 manejar('productos:crear', (datos) => productos.crearProducto(datos));
 manejar('productos:actualizar', (id, datos) => productos.actualizarProducto(id, datos));
 manejar('productos:cambiar-estado', (id, activo) => productos.cambiarEstadoProducto(id, activo));
+
+// ---------- Movimientos (compras, ventas, mermas, devoluciones, ajustes) ----------
+manejar('movimientos:registrar', (datos) => movimientos.registrarMovimiento(datos));
+manejar('movimientos:anular', (id) => movimientos.anularMovimiento(id));
+manejar('movimientos:de-producto', (productoId, limite) => movimientos.historialDeProducto(productoId, limite));
+manejar('movimientos:listar', (filtros) => movimientos.listarMovimientos(filtros));
 
 // ---------- Confirmación genérica ----------
 manejar('dialogo:confirmar', async (opciones) => {

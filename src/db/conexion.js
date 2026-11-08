@@ -66,6 +66,20 @@ const MIGRACIONES = [
     `);
   },
 
+  // ===== Versión 2 (etapa 2): anular movimientos y precio de venta =====
+  () => {
+    db.exec(`
+      -- Un movimiento cargado por error no se borra: se ANULA y deja de sumar al stock
+      ALTER TABLE movimientos ADD COLUMN anulado INTEGER NOT NULL DEFAULT 0;
+      ALTER TABLE movimientos ADD COLUMN anulado_en TEXT;
+
+      -- "Foto" del precio al que se vendió (para los reportes de la etapa 3)
+      ALTER TABLE movimientos ADD COLUMN precio_centavos INTEGER;
+
+      CREATE INDEX idx_movimientos_producto_fecha ON movimientos(producto_id, fecha);
+    `);
+  },
+
   // Las próximas migraciones van acá abajo.
 ];
 
@@ -135,6 +149,23 @@ function hoy() {
   return `${fecha.getFullYear()}-${mes}-${dia}`;
 }
 
+// "2026-02-31" tiene buen formato pero no existe. SQLite no avisa:
+// lo convierte en silencio a "2026-03-03". Por eso lo verificamos acá.
+const FECHA_VALIDA = /^\d{4}-\d{2}-\d{2}$/;
+
+function esFechaReal(valor) {
+  if (!FECHA_VALIDA.test(valor)) return false;
+  const [anio, mes, dia] = valor.split('-').map(Number);
+  const fecha = new Date(anio, mes - 1, dia);
+  return fecha.getFullYear() === anio && fecha.getMonth() === mes - 1 && fecha.getDate() === dia;
+}
+
+function fechaObligatoria(valor, nombreCampo = 'Fecha') {
+  const limpio = String(valor ?? '').trim();
+  if (!esFechaReal(limpio)) throw new Error(`${nombreCampo}: fecha inválida`);
+  return limpio;
+}
+
 // "Azúcar" → "azucar": sin acentos y en minúscula, para buscar y ordenar bien.
 function normalizar(valor) {
   return String(valor ?? '')
@@ -160,4 +191,5 @@ module.exports = {
   hoy,
   normalizar,
   escaparLike,
+  fechaObligatoria,
 };

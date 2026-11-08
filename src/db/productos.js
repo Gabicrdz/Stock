@@ -14,6 +14,7 @@ const CON_STOCK = `
   WITH existencias AS (
     SELECT producto_id, SUM(cantidad) AS stock
       FROM movimientos
+     WHERE anulado = 0          -- los anulados no cuentan
      GROUP BY producto_id
   ),
   productos_con_stock AS (

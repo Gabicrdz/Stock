@@ -32,6 +32,7 @@
             Productos
             <span id="aviso-reponer" class="aviso-pestana" title="Productos para reponer" hidden></span>
           </button>
+          <button class="nav-boton" type="button" data-vista="movimientos">Movimientos</button>
           <button class="nav-boton" type="button" data-vista="categorias">Categorías</button>
         </nav>
       </aside>
@@ -113,6 +114,92 @@
             </div>
 
             <aside id="detalle-producto" class="detalle"></aside>
+          </div>
+        </section>
+
+        <!-- ===== Vista: Movimientos ===== -->
+        <section id="vista-movimientos" class="vista" hidden>
+          <header class="encabezado-vista">
+            <div>
+              <h1>Movimientos</h1>
+              <p class="bajada">Todo lo que entró y salió del almacén, renglón por renglón.</p>
+            </div>
+            <button id="btn-nuevo-movimiento" class="boton boton-primario" type="button">
+              Registrar movimiento
+            </button>
+          </header>
+
+          <!-- Totales del período elegido -->
+          <div class="indicadores">
+            <div class="indicador">
+              <strong id="mov-ventas">$ 0</strong>
+              <span>Vendido</span>
+            </div>
+            <div class="indicador">
+              <strong id="mov-compras">$ 0</strong>
+              <span>Comprado, al costo</span>
+            </div>
+            <div class="indicador">
+              <strong id="mov-mermas">$ 0</strong>
+              <span>Perdido en mermas, al costo</span>
+            </div>
+            <div class="indicador">
+              <strong id="mov-cantidad">0</strong>
+              <span>Movimientos</span>
+            </div>
+          </div>
+
+          <div class="barra-herramientas">
+            <label class="campo-fecha">
+              Desde
+              <input id="mov-desde" type="date" />
+            </label>
+            <label class="campo-fecha">
+              Hasta
+              <input id="mov-hasta" type="date" />
+            </label>
+            <select id="mov-tipo" title="Tipo de movimiento">
+              <option value="todos">Todos los tipos</option>
+              <option value="compra">Compras</option>
+              <option value="venta">Ventas</option>
+              <option value="merma">Mermas</option>
+              <option value="devolucion">Devoluciones</option>
+              <option value="ajuste">Ajustes por conteo</option>
+              <option value="inicial">Stock inicial</option>
+            </select>
+            <input
+              id="mov-buscador"
+              class="buscador"
+              type="search"
+              placeholder="Buscar producto…"
+              autocomplete="off"
+            />
+            <!-- Aparece cuando se llega desde la ficha de un producto -->
+            <span id="mov-filtro-producto" class="filtro-activo" hidden>
+              <span id="mov-filtro-producto-nombre"></span>
+              <button id="mov-quitar-producto" type="button" class="boton-texto" title="Ver todos los productos">
+                Quitar
+              </button>
+            </span>
+            <span id="contador-movimientos" class="contador"></span>
+          </div>
+
+          <div class="tabla-contenedor">
+            <table class="tabla">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Producto</th>
+                  <th>Tipo</th>
+                  <th class="derecha">Cantidad</th>
+                  <th class="derecha">Importe</th>
+                  <th>Nota</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="tabla-movimientos"></tbody>
+            </table>
+            <p id="movimientos-vacio" class="vacio" hidden></p>
           </div>
         </section>
 
@@ -252,6 +339,84 @@
       </form>
     </dialog>
 
+    <!-- ===== Diálogo: movimiento (compra, venta, merma, devolución o ajuste) ===== -->
+    <dialog id="dialogo-movimiento" class="dialogo dialogo-ancho">
+      <form id="form-movimiento" autocomplete="off">
+        <h2 id="titulo-movimiento">Registrar movimiento</h2>
+
+        <!-- Los tipos se arman desde JavaScript según desde dónde se abrió -->
+        <div id="movimiento-tipos" class="segmentos" role="radiogroup" aria-label="Tipo de movimiento"></div>
+        <p id="movimiento-explicacion" class="explicacion"></p>
+
+        <hr class="separador" />
+
+        <!-- Elegir producto: escribiendo o con el lector -->
+        <div id="movimiento-buscar-bloque" class="campo">
+          <label for="movimiento-buscar">Producto</label>
+          <input
+            id="movimiento-buscar"
+            type="search"
+            placeholder="Nombre o código (podés pasar el lector)"
+          />
+          <ul id="movimiento-resultados" class="resultados" hidden></ul>
+        </div>
+
+        <!-- Producto ya elegido -->
+        <div id="movimiento-producto" class="producto-elegido" hidden>
+          <div>
+            <strong id="movimiento-producto-nombre"></strong>
+            <span id="movimiento-producto-stock"></span>
+          </div>
+          <button id="movimiento-cambiar" class="boton-texto" type="button">Cambiar</button>
+        </div>
+
+        <div class="fila">
+          <div class="campo">
+            <label id="etiqueta-cantidad" for="movimiento-cantidad">Cantidad</label>
+            <input id="movimiento-cantidad" name="cantidad" type="text" inputmode="decimal" placeholder="0" />
+          </div>
+          <div class="campo">
+            <label for="movimiento-fecha">Fecha</label>
+            <input id="movimiento-fecha" name="fecha" type="date" required />
+          </div>
+        </div>
+
+        <!-- Solo en compras -->
+        <div id="bloque-costo" class="fila">
+          <div class="campo">
+            <label id="etiqueta-costo" for="movimiento-costo">Costo por unidad ($)</label>
+            <input id="movimiento-costo" name="costo" type="text" inputmode="decimal" />
+          </div>
+          <label class="casilla casilla-campo">
+            <input id="movimiento-actualizar-costo" name="actualizarCosto" type="checkbox" checked />
+            Guardar como nuevo costo del producto
+          </label>
+        </div>
+
+        <!-- Solo en ventas -->
+        <div id="bloque-precio" class="campo">
+          <label id="etiqueta-precio" for="movimiento-precio">Precio cobrado por unidad ($)</label>
+          <input id="movimiento-precio" name="precio" type="text" inputmode="decimal" />
+        </div>
+
+        <div class="campo">
+          <label for="movimiento-motivo">Nota (opcional)</label>
+          <input id="movimiento-motivo" name="motivo" type="text" maxlength="120" />
+        </div>
+
+        <!-- "Stock: 7 → 19 unidades" -->
+        <p id="movimiento-vista-previa" class="vista-previa"></p>
+        <p id="error-movimiento" class="error-form"></p>
+
+        <div class="acciones">
+          <button class="boton boton-primario" type="submit">Guardar</button>
+          <button id="btn-cancelar-movimiento" class="boton boton-secundario" type="button">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </dialog>
+
     <!-- ===== Diálogo: categoría ===== -->
     <dialog id="dialogo-categoria" class="dialogo">
       <form id="form-categoria" autocomplete="off">
@@ -283,7 +448,9 @@
     <!-- El orden importa: primero las herramientas, después lo que las usa -->
     <script src="ui/utilidades.js"></script>
     <script src="ui/app.js"></script>
+    <script src="ui/dialogo-movimiento.js"></script>
     <script src="ui/vista-productos.js"></script>
+    <script src="ui/vista-movimientos.js"></script>
     <script src="ui/vista-categorias.js"></script>
   </body>
 </html>

@@ -24,6 +24,17 @@ function pesos(centavos) {
   return formatoPesos.format(centavos / 100);
 }
 
+// Sin centavos, para los números grandes de arriba: "$ 1.268.560"
+const formatoPesosRedondo = new Intl.NumberFormat('es-AR', {
+  style: 'currency',
+  currency: 'ARS',
+  maximumFractionDigits: 0,
+});
+
+function pesosRedondo(centavos) {
+  return formatoPesosRedondo.format(Math.round(centavos / 100));
+}
+
 // Lee un número escrito "a la argentina": la coma es decimal y el punto separa miles.
 // "1.250,5" → 1250.5 · "1250,5" → 1250.5 · "1250.5" → 1250.5 · "1.250" → 1250
 // Con puntoEsDecimal (para kilos y litros), "0.250" o "1.250" son decimales:
@@ -143,4 +154,69 @@ function nivelStock(producto) {
   // Un poquito de barra aunque quede poco, para que se vea que algo hay
   relleno.style.width = `${stock > 0 ? Math.max(porcentaje, 6) : 0}%`;
   return crear('span', { clase: `nivel ${clase}`, titulo: 'Nivel de stock respecto del mínimo' }, [relleno]);
+}
+
+// ---------- Movimientos ----------
+// grupo: de qué lado del mostrador está. Explicación y textos para el formulario.
+const TIPOS_MOVIMIENTO = {
+  compra: {
+    nombre: 'Compra',
+    registrado: 'Compra registrada',
+    grupo: 'entrada',
+    explicacion: 'Entra mercadería que le compraste a un proveedor.',
+    cantidad: 'Cantidad que entra',
+    nota: 'Proveedor, número de factura…',
+  },
+  devolucion: {
+    nombre: 'Devolución',
+    registrado: 'Devolución registrada',
+    grupo: 'entrada',
+    explicacion: 'Un cliente devolvió mercadería y vuelve al estante.',
+    cantidad: 'Cantidad que vuelve',
+    nota: 'Por qué la devolvió…',
+  },
+  venta: {
+    nombre: 'Venta',
+    registrado: 'Venta registrada',
+    grupo: 'salida',
+    explicacion: 'Sale mercadería que se vendió.',
+    cantidad: 'Cantidad vendida',
+    nota: 'Cliente, forma de pago…',
+  },
+  merma: {
+    nombre: 'Merma',
+    registrado: 'Merma registrada',
+    grupo: 'salida',
+    explicacion: 'Sale mercadería que se rompió, se venció o se perdió.',
+    cantidad: 'Cantidad que se pierde',
+    nota: 'Se rompió, se venció…',
+  },
+  ajuste: {
+    nombre: 'Ajuste por conteo',
+    registrado: 'Stock ajustado',
+    grupo: 'ajuste',
+    explicacion:
+      'Contaste el estante y no coincide con el sistema: cargá lo que contaste y el sistema corrige la diferencia.',
+    cantidad: 'Cantidad contada',
+    nota: 'Conteo de inventario',
+  },
+  inicial: { nombre: 'Stock inicial', grupo: 'entrada' },
+};
+
+// 12000 → "+12 u." · -3000 → "−3 u." (con el signo menos de verdad, que es más largo)
+function cantidadConSigno(milesimas, unidad) {
+  const signo = milesimas > 0 ? '+' : '−';
+  return `${signo}${cantidadCorta(Math.abs(milesimas), unidad)}`;
+}
+
+// Fecha de hoy (de la compu) como "AAAA-MM-DD"
+function hoyISO() {
+  const fecha = new Date();
+  const dos = (n) => String(n).padStart(2, '0');
+  return `${fecha.getFullYear()}-${dos(fecha.getMonth() + 1)}-${dos(fecha.getDate())}`;
+}
+
+// Primer día del mes actual: "AAAA-MM-01"
+function primerDiaDelMes() {
+  return `${hoyISO().slice(0, 7)}-01`;
 }

@@ -17,6 +17,13 @@ contextBridge.exposeInMainWorld('api', {
   actualizarProducto: (id, datos) => ipcRenderer.invoke('productos:actualizar', id, datos),
   cambiarEstadoProducto: (id, activo) => ipcRenderer.invoke('productos:cambiar-estado', id, activo),
 
+  // Movimientos
+  registrarMovimiento: (datos) => ipcRenderer.invoke('movimientos:registrar', datos),
+  anularMovimiento: (id) => ipcRenderer.invoke('movimientos:anular', id),
+  historialDeProducto: (productoId, limite) =>
+    ipcRenderer.invoke('movimientos:de-producto', productoId, limite),
+  listarMovimientos: (filtros) => ipcRenderer.invoke('movimientos:listar', filtros),
+
   // Diálogos
   confirmar: (opciones) => ipcRenderer.invoke('dialogo:confirmar', opciones),
 });
